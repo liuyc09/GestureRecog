@@ -25,14 +25,16 @@
 
 //sys
 #include <iostream>
+#include <string>
 
 //OpenCV
 #include <opencv2/core/core.hpp>
 #include <opencv2/highgui/highgui.hpp>
 
-//color detector, controller
+//color detector, controller, histogram
 #include "colorDetectController.h"
 #include "colordetector.h"
+#include "colorhistogram.h"
 
 namespace Ui {
     class GestureRecognition;
@@ -50,31 +52,37 @@ protected:
 
     // camera vars
     cv::VideoCapture cap;
+    static const int CAMERA = 1;
 
     //timer
     QTimer* timer;
     bool process;
+    bool histEnable;
+    cv::Mat histogram;
+    ColorHistogram cHist;
 
 
     //Main Image
-    //cv::Mat img_mat;
+    //cv::Mat image;
 
 private:
     Ui::GestureRecognition *ui;
 
-    //DEFAULTS!!!
-    static const int CAMERA = 1;
-    static const int THRESHOLD = 139;
-    static const int RED = 255, GREEN = 222, BLUE = 196;
+    int color[3];
+    int threshold;
 
 private slots:
     void processColorDetection();
-    void on_verticalSlider_Threshold_valueChanged(int value);
-    void setColor();
-    void setColor(QColor color);
+    void showHistogram();
+    void pickColor();
     void setImage();
     void toggleCamera();
     void updateTimer();
+    void setThreshold(int value);
+    void setColor();
+    void setColor1(int value);
+    void setColor2(int value);
+    void setColor3(int value);
 };
 
 #endif // GESTURERECOGNITION_H

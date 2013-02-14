@@ -22,7 +22,8 @@
 #include <opencv2/imgproc/imgproc.hpp>
 #include <iostream>
 
-class ColorDetector {
+class ColorDetector
+{
 
   private:
 
@@ -40,7 +41,8 @@ class ColorDetector {
 
       // inline private member function
       // Computes the distance from target color.
-      int getDistance(const cv::Vec3b& color) const {
+      int getDistance(const cv::Vec3b& color) const
+      {
         return static_cast<int>(cv::norm<int,3>(
             cv::Vec3i(color[0]-target[0],
                     color[1]-target[1],
@@ -50,7 +52,8 @@ class ColorDetector {
   public:
 
       // empty constructor
-      ColorDetector() : minDist(100) {
+      ColorDetector() : minDist(100)
+      {
 
           // default parameter initialization here
           target[0]= target[1]= target[2]= 0;
@@ -61,7 +64,8 @@ class ColorDetector {
       // Sets the color distance threshold.
       // Threshold must be positive, otherwise distance threshold
       // is set to 0.
-      void setColorDistanceThreshold(int distance) {
+      void setColorDistanceThreshold(int distance)
+      {
 
           if (distance<0)
               distance=0;
@@ -69,7 +73,8 @@ class ColorDetector {
       }
 
       // Gets the color distance threshold
-      int getColorDistanceThreshold() const {
+      int getColorDistanceThreshold() const
+      {
 
           return minDist;
       }
@@ -83,20 +88,14 @@ class ColorDetector {
         tmp.at<cv::Vec3b>(0,0)[1]= green;
         tmp.at<cv::Vec3b>(0,0)[2]= red;
 
-        // Converting the target to Lab color space
+        // Converting the target to HSV color space
         cv::cvtColor(tmp, tmp, CV_BGR2HSV);
         target= tmp.at<cv::Vec3b>(0,0);
       }
 
-        // Sets the color to be detected
-        void setTargetColor(cv::Vec3b color)
-        {
-
-          target= color;
-      }
-
       // Gets the color to be detected
-      cv::Vec3b getTargetColor() const {
+      cv::Vec3b getTargetColor() const
+      {
 
           if(target[0] == 0 && target[1] == 0 && target[2] == 0)
               return target;

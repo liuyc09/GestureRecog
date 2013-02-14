@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>641</width>
-    <height>424</height>
+    <width>745</width>
+    <height>580</height>
    </rect>
   </property>
   <property name="Gesture Recognition" stdset="0">
@@ -19,7 +19,7 @@
      <rect>
       <x>10</x>
       <y>40</y>
-      <width>131</width>
+      <width>221</width>
       <height>41</height>
      </rect>
     </property>
@@ -30,10 +30,10 @@
    <widget class="QPushButton" name="pushButton_Process">
     <property name="geometry">
      <rect>
-      <x>60</x>
-      <y>330</y>
-      <width>81</width>
-      <height>31</height>
+      <x>320</x>
+      <y>460</y>
+      <width>131</width>
+      <height>51</height>
      </rect>
     </property>
     <property name="text">
@@ -43,10 +43,10 @@
    <widget class="QLabel" name="label">
     <property name="geometry">
      <rect>
-      <x>190</x>
+      <x>250</x>
       <y>10</y>
-      <width>421</width>
-      <height>341</height>
+      <width>481</width>
+      <height>431</height>
      </rect>
     </property>
     <property name="frameShape">
@@ -68,7 +68,7 @@
       <x>20</x>
       <y>110</y>
       <width>21</width>
-      <height>251</height>
+      <height>361</height>
      </rect>
     </property>
     <property name="maximum">
@@ -86,7 +86,7 @@
      <rect>
       <x>10</x>
       <y>70</y>
-      <width>131</width>
+      <width>221</width>
       <height>41</height>
      </rect>
     </property>
@@ -94,30 +94,30 @@
      <string>Select Color</string>
     </property>
    </widget>
-   <widget class="QLabel" name="label_Color">
+   <widget class="QLabel" name="label_Color1">
     <property name="geometry">
      <rect>
-      <x>60</x>
-      <y>140</y>
-      <width>111</width>
-      <height>31</height>
+      <x>80</x>
+      <y>490</y>
+      <width>41</width>
+      <height>21</height>
      </rect>
     </property>
     <property name="text">
-     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Color:&lt;br/&gt;&lt;span style=&quot; color:#000080;&quot;&gt;255&lt;/span&gt;&lt;span style=&quot; color:#000000;&quot;&gt;,&lt;/span&gt;&lt;span style=&quot; color:#c0c0c0;&quot;/&gt;&lt;span style=&quot; color:#000080;&quot;&gt;222&lt;/span&gt;&lt;span style=&quot; color:#000000;&quot;&gt;,&lt;/span&gt;&lt;span style=&quot; color:#c0c0c0;&quot;/&gt;&lt;span style=&quot; color:#000080;&quot;&gt;196&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;center&quot;&gt;Red&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
     </property>
    </widget>
    <widget class="QLabel" name="label_Threshold">
     <property name="geometry">
      <rect>
-      <x>60</x>
-      <y>190</y>
-      <width>111</width>
-      <height>31</height>
+      <x>10</x>
+      <y>470</y>
+      <width>41</width>
+      <height>21</height>
      </rect>
     </property>
     <property name="text">
-     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Threshold: 136&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;center&quot;&gt;136&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
     </property>
    </widget>
    <widget class="QPushButton" name="pushButton_Camera">
@@ -125,12 +125,160 @@
      <rect>
       <x>10</x>
       <y>10</y>
-      <width>131</width>
+      <width>221</width>
       <height>41</height>
      </rect>
     </property>
     <property name="text">
      <string>Show Camera</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="pushButton_Histogram">
+    <property name="geometry">
+     <rect>
+      <x>550</x>
+      <y>460</y>
+      <width>131</width>
+      <height>51</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Show Histogram</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_Threshold2">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>490</y>
+      <width>51</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Thresh&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+    </property>
+   </widget>
+   <widget class="QSlider" name="verticalSlider_Color1">
+    <property name="geometry">
+     <rect>
+      <x>90</x>
+      <y>110</y>
+      <width>21</width>
+      <height>361</height>
+     </rect>
+    </property>
+    <property name="maximum">
+     <number>255</number>
+    </property>
+    <property name="value">
+     <number>136</number>
+    </property>
+    <property name="orientation">
+     <enum>Qt::Vertical</enum>
+    </property>
+   </widget>
+   <widget class="QSlider" name="verticalSlider_Color2">
+    <property name="geometry">
+     <rect>
+      <x>150</x>
+      <y>110</y>
+      <width>21</width>
+      <height>361</height>
+     </rect>
+    </property>
+    <property name="maximum">
+     <number>255</number>
+    </property>
+    <property name="value">
+     <number>136</number>
+    </property>
+    <property name="orientation">
+     <enum>Qt::Vertical</enum>
+    </property>
+   </widget>
+   <widget class="QSlider" name="verticalSlider_Color3">
+    <property name="geometry">
+     <rect>
+      <x>210</x>
+      <y>110</y>
+      <width>21</width>
+      <height>361</height>
+     </rect>
+    </property>
+    <property name="maximum">
+     <number>255</number>
+    </property>
+    <property name="value">
+     <number>136</number>
+    </property>
+    <property name="orientation">
+     <enum>Qt::Vertical</enum>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_Color2">
+    <property name="geometry">
+     <rect>
+      <x>130</x>
+      <y>490</y>
+      <width>51</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;center&quot;&gt;Green&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_Color3">
+    <property name="geometry">
+     <rect>
+      <x>190</x>
+      <y>490</y>
+      <width>51</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;center&quot;&gt;Blue&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_Color1_2">
+    <property name="geometry">
+     <rect>
+      <x>80</x>
+      <y>470</y>
+      <width>41</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;center&quot;&gt;136&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_Color2_2">
+    <property name="geometry">
+     <rect>
+      <x>130</x>
+      <y>470</y>
+      <width>51</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;center&quot;&gt;136&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_Color3_2">
+    <property name="geometry">
+     <rect>
+      <x>190</x>
+      <y>470</y>
+      <width>51</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;center&quot;&gt;136&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
     </property>
    </widget>
   </widget>
@@ -139,7 +287,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>641</width>
+     <width>745</width>
      <height>22</height>
     </rect>
    </property>

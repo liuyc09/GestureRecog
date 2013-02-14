@@ -23,22 +23,24 @@ GestureRecognition::GestureRecognition(QWidget *parent) :
     ui(new Ui::GestureRecognition)
 {
     ui->setupUi(this);
-    // default skin tone matching
-    ui->verticalSlider_Threshold->setSliderPosition(THRESHOLD);
-    setColor(QColor(RED, GREEN, BLUE));
+
+    //default settings
     process = false;
+    histEnable = false;
+    cHist = ColorHistogram();
+    //RGB defaults *** Change for Hsv
+    color[0] = 198;
+    color[1] = 158;
+    color[2] = 93;
+    setColor();
+    threshold = 50;
 
 
-    // slot action methods -------------
-    //select color
-    connect(ui->pushButton_Color, SIGNAL(clicked()), this, SLOT(setColor()));
-    //open image
-    connect(ui->pushButton_OpenImage, SIGNAL(clicked()), this, SLOT(setImage()));
-    //process Color Detection
-    connect(ui->pushButton_Process, SIGNAL(clicked()), this, SLOT(processColorDetection()));
-    //process Color Detection
-    connect(ui->pushButton_Camera, SIGNAL(clicked()), this, SLOT(toggleCamera()));
-    //end slots ----------------
+    // defaults for sliders
+    ui->verticalSlider_Threshold->setSliderPosition(threshold);
+    ui->verticalSlider_Color1->setSliderPosition(color[0]);
+    ui->verticalSlider_Color2->setSliderPosition(color[1]);
+    ui->verticalSlider_Color3->setSliderPosition(color[2]);
 
 
     //set up video ------------------
@@ -47,12 +49,28 @@ GestureRecognition::GestureRecognition(QWidget *parent) :
     // check if we succeeded, if not do not enable camera toggle
     if(!cap.isOpened())
         ui->pushButton_Camera->setEnabled(false);
-
     //set up timer for camera display
     timer = new QTimer(this);
-    //slot action method
-    connect(timer, SIGNAL(timeout()), this, SLOT(updateTimer()));
     //end video ---------------------
+
+
+    // slot action methods -------------
+    //select color
+    connect(timer, SIGNAL(timeout()), this, SLOT(updateTimer()));
+    connect(ui->pushButton_Color, SIGNAL(clicked()), this, SLOT(pickColor()));
+    connect(ui->pushButton_OpenImage, SIGNAL(clicked()), this, SLOT(setImage()));
+    connect(ui->pushButton_Camera, SIGNAL(clicked()), this, SLOT(toggleCamera()));
+    connect(ui->pushButton_Process, SIGNAL(clicked()), this, SLOT(processColorDetection()));
+    connect(ui->pushButton_Histogram, SIGNAL(clicked()), this, SLOT(showHistogram()));
+    connect(ui->verticalSlider_Threshold, SIGNAL(valueChanged(int)), 
+                                            this, SLOT(setThreshold(int)));
+    connect(ui->verticalSlider_Color1, SIGNAL(valueChanged(int)), 
+                                            this, SLOT(setColor1(int)));
+    connect(ui->verticalSlider_Color2, SIGNAL(valueChanged(int)), 
+                                            this, SLOT(setColor2(int)));
+    connect(ui->verticalSlider_Color3, SIGNAL(valueChanged(int)), 
+                                            this, SLOT(setColor3(int)));
+    //end slots ----------------
 }
 
 GestureRecognition::~GestureRecognition()
@@ -74,6 +92,7 @@ void GestureRecognition::changeEvent(QEvent *e)
 
 void GestureRecognition::setImage()
 {
+    timer->stop();
     QFileDialog::Options options;
     QString selectedFilter;
     QString fileName = QFileDialog::getOpenFileName(this,
@@ -83,11 +102,11 @@ void GestureRecognition::setImage()
                                 &selectedFilter,
                                 options);
     if (!fileName.isEmpty()){
-        cv::Mat img_mat = cv::imread(fileName.toStdString(),1); //0 for grayscale
-        displayMat(img_mat);
+        cv::Mat image = cv::imread(fileName.toStdString(),1); //0 for grayscale
+        displayMat(image);
+        //Set Filename
+        ColorDetectController::getInstance()->setInputImage(fileName.toStdString());
     }
-    //Set Filename
-    ColorDetectController::getInstance()->setInputImage(fileName.toStdString());
 }
 
 void GestureRecognition::toggleCamera()
@@ -98,7 +117,7 @@ void GestureRecognition::toggleCamera()
         timer->stop();
     else
     {
-        timer->start(50);
+        timer->start(25);
     }
 
 }
@@ -125,61 +144,26 @@ void GestureRecognition::displayMat(const cv::Mat& image)
     this->ui->label->setPixmap(img_pix.scaled(ui->label->size(), Qt::KeepAspectRatio));
 }
 
-void GestureRecognition::on_verticalSlider_Threshold_valueChanged(int value)
+
+void GestureRecognition::pickColor()
 {
-    QString thresh("Threshold: ");
-    thresh.append(QString::number(value));
-    this->ui->label_Threshold->setText(thresh);
-    //processColorDetection();
+    QColor picked = QColorDialog::getColor(QColor(color[0], color[1], color[2]), this);
+    ColorDetectController::getInstance()->setTargetColor(picked.red(),picked.green(),picked.blue());
 }
 
 void GestureRecognition::setColor()
 {
-    QString clrTxt("Color:\n");
-    cv::Vec3b prevColor = ColorDetectController::getInstance()->getTargetColor();
-    QColor color = QColorDialog::getColor(QColor(prevColor[2], prevColor[1], prevColor[0]), this);
-    if (color.isValid()) {
-       ColorDetectController::getInstance()->setTargetColor(color.red(),color.green(),color.blue());
-
-       clrTxt.append(QString::number(color.red()) + ", " + QString::number(color.green()) + ", " + QString::number(color.blue()));
-       this->ui->label_Color->setText(clrTxt);
-       ui->pushButton_Process->setEnabled(true);
-    }
-    else
-    {
-        ui->pushButton_Process->setEnabled(false);
-    }
-}
-
-void GestureRecognition::setColor(QColor color)
-{
-    if (color.isValid()) 
-    {
-        QString clrTxt("Color:\n");
-        ColorDetectController::getInstance()->setTargetColor(color.red(),
-                                        color.green(),color.blue());
-        clrTxt.append(QString::number(color.red()) + ", " 
-            + QString::number(color.green()) + ", " 
-            + QString::number(color.blue()));
-        this->ui->label_Color->setText(clrTxt);
-        ui->pushButton_Process->setEnabled(true);
-    }
-    else
-    {
-        ui->pushButton_Process->setEnabled(false);
-    }
+    ColorDetectController::getInstance()->setTargetColor(color[0],
+                                        color[1],color[2]);
 }
 
 void GestureRecognition::processColorDetection()
 {
-    ColorDetectController::getInstance()->setColorDistanceThreshold(
-                                ui->verticalSlider_Threshold->value());
     if(timer->isActive())
         process = !process;
     else
     {
         ColorDetectController::getInstance()->process();
-    
         cv::Mat resulting = ColorDetectController::getInstance()->getLastResult();
         if (!resulting.empty())
             displayMat(resulting);
@@ -192,10 +176,13 @@ void GestureRecognition::updateTimer()
     cv::Mat img;
     cap >> img;
     ColorDetectController::getInstance()->setInputImage(img);
+    if(histEnable)
+    {
+        histogram = cHist.getHistogramImage(img);
+        cv::imshow("Histogram", histogram);
+    }
     if(process)
     {
-        ColorDetectController::getInstance()->setColorDistanceThreshold(
-                                ui->verticalSlider_Threshold->value());
         ColorDetectController::getInstance()->process();
     
         cv::Mat resulting = ColorDetectController::getInstance()->getLastResult();
@@ -203,4 +190,60 @@ void GestureRecognition::updateTimer()
             img = resulting;
     }
     displayMat(img);
+}
+
+void GestureRecognition::showHistogram()
+{
+    if(timer->isActive() && !histEnable)
+    {
+        cv::namedWindow("Histogram", cv::WINDOW_AUTOSIZE);
+        histEnable = true;
+    }
+    else if (!timer->isActive())
+    {
+        histogram = cHist.getHistogramImage(ColorDetectController::getInstance()->getInputImage());
+        cv::imshow("Histogram", histogram);
+        histEnable = false;
+    }
+    else
+    {
+        cv::destroyWindow("Histogram");
+        histEnable = false;
+    }
+}
+
+//Threshold slider change method
+void GestureRecognition::setThreshold(int value)
+{
+    threshold = value;
+    this->ui->label_Threshold->setText(QString::number(value));
+    ColorDetectController::getInstance()->setColorDistanceThreshold(threshold);
+    if(!timer->isActive())
+        processColorDetection();
+}
+
+//Color Slider change methods
+void GestureRecognition::setColor1(int value)
+{
+    color[0] = value;
+    this->ui->label_Color1_2->setText(QString::number(value));
+    setColor();
+    if(!timer->isActive())
+        processColorDetection();
+}
+void GestureRecognition::setColor2(int value)
+{
+    color[1] = value;
+    this->ui->label_Color2_2->setText(QString::number(value));
+    setColor();
+    if(!timer->isActive())
+        processColorDetection();
+}
+void GestureRecognition::setColor3(int value)
+{
+    color[2] = value;
+    this->ui->label_Color3_2->setText(QString::number(value));
+    setColor();
+    if(!timer->isActive())
+        processColorDetection();
 }
