@@ -13,20 +13,25 @@ TEMPLATE = app
 
 
 SOURCES += main.cpp\
-        gesturerecognition.cpp \
     colordetector.cpp \
     colordetectcontroller.cpp \
     skindetectcontroller.cpp \
-    skindetector.cpp
+    skindetector.cpp \
+    gesturedetection.cpp \
+    MaskSelection.cpp
 
-HEADERS  += gesturerecognition.h \
+HEADERS  += \
     colordetector.h \
     colordetectcontroller.h \
     colorhistogram.h \
     skindetectcontroller.h \
-    skindetector.h
+    skindetector.h \
+    gesturedetection.h \
+    maskselection.h
 
-FORMS    += gesturerecognition.ui
+FORMS    += \
+    gesturedetection.ui \
+    maskselection.ui
 
 
 

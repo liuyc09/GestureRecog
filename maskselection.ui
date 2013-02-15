@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>GestureRecognition</class>
- <widget class="QMainWindow" name="GestureRecognition">
+ <class>MaskSelection</class>
+ <widget class="QMainWindow" name="MaskSelection">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -10,8 +10,8 @@
     <height>580</height>
    </rect>
   </property>
-  <property name="Gesture Recognition" stdset="0">
-   <string>GestureRecognition</string>
+  <property name="Mask Selection" stdset="0">
+   <string>MaskSelection</string>
   </property>
   <widget class="QWidget" name="centralWidget">
    <widget class="QPushButton" name="pushButton_OpenImage">

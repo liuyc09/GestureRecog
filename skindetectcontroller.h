@@ -34,6 +34,36 @@ class SkinDetectController
 			setThreshold(10);
 		}
 
+		// Sets the input image. Reads it from file.
+		bool setInputImage(std::string filename)
+		{
+
+		  image= cv::imread(filename);
+
+		  if (!image.data)
+		      return false;
+		  else
+		      return true;
+		}
+
+		// Sets the input image.
+		bool setInputImage(cv::Mat imgIn)
+		{
+
+		  image = imgIn;
+
+		  if (!image.data)
+		      return false;
+		  else
+		      return true;
+		}
+
+		// Returns the current input image.
+		const cv::Mat getInputImage() const 
+		{
+			return image;
+		}
+
 		void setThreshold(int range)
 		{
 			this->range = range;
@@ -46,11 +76,21 @@ class SkinDetectController
 			sknDetect->setThreshold(min, max);
 		}
 
-		void setColor(int hue, int saturation, int value)
+		int getThreshold()
+		{
+			return range;
+		}
+
+		void setHSV(int hue, int saturation, int value)
 		{
 			targetHSV[0] = hue;
 			targetHSV[1] = saturation;
 			targetHSV[2] = value;
+		}
+
+		void process() 
+		{
+			resultImg = sknDetect->processHSV(image);
 		}
 
 		// Deletes all processor objects created by the controller.
@@ -73,7 +113,8 @@ class SkinDetectController
 		// Releases the singleton instance of this controller.
 		static void destroy() 
 		{
-		  if (singleton != 0) {
+		  if (singleton != 0)
+		  {
 		      delete singleton;
 		      singleton= 0;
 		  }

@@ -86,7 +86,7 @@ class ColorDetectController {
               return true;
       }
 
-      // Sets the input image. Reads it from file.
+      // Sets the input image.
       bool setInputImage(cv::Mat imgIn) {
 
           image = imgIn;

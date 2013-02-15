@@ -15,8 +15,8 @@
    Copyright (C) 2010-2011 Robert Laganiere, www.laganiere.name
 \*------------------------------------------------------------------------------------------*/
 
-#ifndef GESTURERECOGNITION_H
-#define GESTURERECOGNITION_H
+#ifndef MASKSELECTION_H
+#define MASKSELECTION_H
 
 #include <QMainWindow>
 #include <QFileDialog>
@@ -37,14 +37,14 @@
 #include "colorhistogram.h"
 
 namespace Ui {
-    class GestureRecognition;
+    class MaskSelection;
 }
 
-class GestureRecognition : public QMainWindow{
+class MaskSelection : public QMainWindow{
     Q_OBJECT
 public:
-    GestureRecognition(QWidget *parent = 0);
-    ~GestureRecognition();
+    MaskSelection(QWidget *parent = 0);
+    ~MaskSelection();
 
 protected:
     void changeEvent(QEvent *e);
@@ -66,7 +66,7 @@ protected:
     //cv::Mat image;
 
 private:
-    Ui::GestureRecognition *ui;
+    Ui::MaskSelection *ui;
 
     int color[3];
     int threshold;
@@ -85,4 +85,4 @@ private slots:
     void setColor3(int value);
 };
 
-#endif // GESTURERECOGNITION_H
+#endif // MASKSELECTION_H
