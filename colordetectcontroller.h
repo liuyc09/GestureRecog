@@ -22,6 +22,7 @@
 #include <opencv2/core/core.hpp>
 #include <opencv2/highgui/highgui.hpp>
 #include "colordetector.h"
+#include <iostream>
 
 class ColorDetectController {
 
@@ -104,9 +105,9 @@ class ColorDetectController {
       }
 
       // Performs image processing.
-      void process() {
-
-          result= cdetect->process(image);
+      void process() 
+      {
+        result= cdetect->process(image);
       }
 
 

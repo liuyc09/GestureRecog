@@ -17,8 +17,8 @@ SOURCES += main.cpp\
     colordetectcontroller.cpp \
     skindetectcontroller.cpp \
     skindetector.cpp \
-    gesturedetection.cpp \
-    MaskSelection.cpp
+    maskselection.cpp \
+    gesturedetector.cpp
 
 HEADERS  += \
     colordetector.h \
@@ -26,12 +26,14 @@ HEADERS  += \
     colorhistogram.h \
     skindetectcontroller.h \
     skindetector.h \
-    gesturedetection.h \
-    maskselection.h
+    gesturedetector.h \
+    maskselection.h \
+    gesturedetector.h
 
 FORMS    += \
-    gesturedetection.ui \
-    maskselection.ui
+    gesturedetector.ui \
+    maskselection.ui \
+    gesturedetector.ui
 
 
 

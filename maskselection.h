@@ -35,6 +35,7 @@
 #include "colorDetectController.h"
 #include "colordetector.h"
 #include "colorhistogram.h"
+#include "gesturedetector.h"
 
 namespace Ui {
     class MaskSelection;
@@ -67,6 +68,7 @@ protected:
 
 private:
     Ui::MaskSelection *ui;
+    GestureDetector *gd;
 
     int color[3];
     int threshold;
@@ -83,6 +85,7 @@ private slots:
     void setColor1(int value);
     void setColor2(int value);
     void setColor3(int value);
+    void beginDetection();
 };
 
 #endif // MASKSELECTION_H

@@ -23,9 +23,9 @@ class SkinDetectController
 		cv::Vec3b targetHSV;
 		int range;
 
-		// image storage
-		cv::Mat image;
-		cv::Mat resultImg;
+		// hsvImage storage
+		cv::Mat hsvImage;
+		cv::Mat resultHSVImg;
 
 	public:
 		SkinDetectController()
@@ -34,34 +34,34 @@ class SkinDetectController
 			setThreshold(10);
 		}
 
-		// Sets the input image. Reads it from file.
+		// Sets the input hsvImage. Reads it from file.
 		bool setInputImage(std::string filename)
 		{
 
-		  image= cv::imread(filename);
+		  hsvImage= cv::imread(filename);
 
-		  if (!image.data)
+		  if (!hsvImage.data)
 		      return false;
 		  else
 		      return true;
 		}
 
-		// Sets the input image.
+		// Sets the input hsvImage.
 		bool setInputImage(cv::Mat imgIn)
 		{
 
-		  image = imgIn;
+		  hsvImage = imgIn;
 
-		  if (!image.data)
+		  if (!hsvImage.data)
 		      return false;
 		  else
 		      return true;
 		}
 
-		// Returns the current input image.
+		// Returns the current input hsvImage.
 		const cv::Mat getInputImage() const 
 		{
-			return image;
+			return hsvImage;
 		}
 
 		void setThreshold(int range)
@@ -81,7 +81,7 @@ class SkinDetectController
 			return range;
 		}
 
-		void setHSV(int hue, int saturation, int value)
+		void setTargetHSV(int hue, int saturation, int value)
 		{
 			targetHSV[0] = hue;
 			targetHSV[1] = saturation;
@@ -90,7 +90,12 @@ class SkinDetectController
 
 		void process() 
 		{
-			resultImg = sknDetect->processHSV(image);
+			resultHSVImg = sknDetect->processHSV(hsvImage);
+		}
+
+		const cv::Mat getLastResult() const
+		{
+			return resultHSVImg;
 		}
 
 		// Deletes all processor objects created by the controller.

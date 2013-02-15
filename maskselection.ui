@@ -30,7 +30,7 @@
    <widget class="QPushButton" name="pushButton_Process">
     <property name="geometry">
      <rect>
-      <x>320</x>
+      <x>260</x>
       <y>460</y>
       <width>131</width>
       <height>51</height>
@@ -136,7 +136,7 @@
    <widget class="QPushButton" name="pushButton_Histogram">
     <property name="geometry">
      <rect>
-      <x>550</x>
+      <x>400</x>
       <y>460</y>
       <width>131</width>
       <height>51</height>
@@ -279,6 +279,19 @@
     </property>
     <property name="text">
      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;center&quot;&gt;136&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="pushButton_SetMask">
+    <property name="geometry">
+     <rect>
+      <x>550</x>
+      <y>450</y>
+      <width>191</width>
+      <height>71</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Set Mask and Detect</string>
     </property>
    </widget>
   </widget>
