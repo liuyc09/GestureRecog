@@ -32,8 +32,7 @@
 #include <opencv2/highgui/highgui.hpp>
 
 //color detector, controller, histogram
-#include "colorDetectController.h"
-#include "colordetector.h"
+#include "skindetectcontroller.h"
 #include "colorhistogram.h"
 #include "gesturedetector.h"
 
@@ -55,36 +54,37 @@ protected:
     cv::VideoCapture cap;
     static const int CAMERA = 1;
 
-    //timer
+    // timer vars
     QTimer* timer;
     bool process;
     bool histEnable;
-    cv::Mat histogram;
-    ColorHistogram cHist;
 
 
-    //Main Image
-    //cv::Mat image;
+
 
 private:
     Ui::MaskSelection *ui;
     GestureDetector *gd;
 
-    int color[3];
-    int threshold;
+    // the thresholding masks
+    cv::Scalar min, max;
+
+    cv::Mat histogram;
+    ColorHistogram cHist;
 
 private slots:
     void processColorDetection();
     void showHistogram();
-    void pickColor();
     void setImage();
     void toggleCamera();
     void updateTimer();
-    void setThreshold(int value);
-    void setColor();
-    void setColor1(int value);
-    void setColor2(int value);
-    void setColor3(int value);
+    void setThreshold();
+    void setMinHue(int value);
+    void setMinSat(int value);
+    void setMinValue(int value);
+    void setMaxHue(int value);
+    void setMaxSat(int value);
+    void setMaxValue(int value);
     void beginDetection();
 };
 

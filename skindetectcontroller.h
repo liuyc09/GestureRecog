@@ -11,6 +11,7 @@
 #include <opencv2/core/core.hpp>
 #include <opencv2/highgui/highgui.hpp>
 #include "skindetector.h"
+#include <iostream>
 
 class SkinDetectController
 {
@@ -20,82 +21,14 @@ class SkinDetectController
 
 		SkinDetector *sknDetect;
 
-		cv::Vec3b targetHSV;
-		int range;
-
 		// hsvImage storage
 		cv::Mat hsvImage;
-		cv::Mat resultHSVImg;
+		cv::Mat resultImg;
 
 	public:
 		SkinDetectController()
 		{
-			sknDetect = new SkinDetector();
-			setThreshold(10);
-		}
-
-		// Sets the input hsvImage. Reads it from file.
-		bool setInputImage(std::string filename)
-		{
-
-		  hsvImage= cv::imread(filename);
-
-		  if (!hsvImage.data)
-		      return false;
-		  else
-		      return true;
-		}
-
-		// Sets the input hsvImage.
-		bool setInputImage(cv::Mat imgIn)
-		{
-
-		  hsvImage = imgIn;
-
-		  if (!hsvImage.data)
-		      return false;
-		  else
-		      return true;
-		}
-
-		// Returns the current input hsvImage.
-		const cv::Mat getInputImage() const 
-		{
-			return hsvImage;
-		}
-
-		void setThreshold(int range)
-		{
-			this->range = range;
-			cv::Vec3b min, max;
-			for(int i =0; i <3; i++)
-			{
-				min[i] = targetHSV[i] - (range/2);
-				max[i] = targetHSV[i] + (range/2);
-			}
-			sknDetect->setThreshold(min, max);
-		}
-
-		int getThreshold()
-		{
-			return range;
-		}
-
-		void setTargetHSV(int hue, int saturation, int value)
-		{
-			targetHSV[0] = hue;
-			targetHSV[1] = saturation;
-			targetHSV[2] = value;
-		}
-
-		void process() 
-		{
-			resultHSVImg = sknDetect->processHSV(hsvImage);
-		}
-
-		const cv::Mat getLastResult() const
-		{
-			return resultHSVImg;
+            sknDetect = new SkinDetector();
 		}
 
 		// Deletes all processor objects created by the controller.
@@ -124,6 +57,58 @@ class SkinDetectController
 		      singleton= 0;
 		  }
 		}
+		
+
+
+
+		// Sets the input hsvImage. Reads it from file.
+		bool setInputImage(std::string filename)
+		{
+
+			cv::Mat imgIn = cv::imread(filename);
+			// convert color space
+			cv::cvtColor(imgIn, hsvImage, CV_BGR2HSV);
+
+			if (!hsvImage.data)
+			  return false;
+			else
+		      return true;
+		}
+
+		// Sets the input hsvImage.
+		bool setInputImage(cv::Mat imgIn)
+		{
+			// convert color space
+			cv::cvtColor(imgIn, hsvImage, CV_BGR2HSV);
+
+			if (!hsvImage.data)
+			  return false;
+			else
+			  return true;
+		}
+
+		// Returns the current input hsvImage.
+		// NOTE: this returns HSV!!!!!
+		const cv::Mat getHSVImage() const 
+		{
+			return hsvImage;
+		}
+
+		const cv::Mat getLastResult() const
+		{
+			return resultImg;
+		}
+
+		void setThreshold(cv::Scalar min, cv::Scalar max)
+		{
+			sknDetect->setThreshold(min, max);
+		}
+
+		void process() 
+		{
+			resultImg = sknDetect->processHSV(hsvImage);
+		}
+
 };
 
 #endif

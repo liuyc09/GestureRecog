@@ -22,7 +22,7 @@ class SkinDetector
 	private:
 
 		// HSV min and max limits as array of Scalars
-        cv::Vec3b hsvThreshold[2];
+        cv::Scalar hsvThreshold[2];
 
 		// image containing result of processing
 		cv::Mat resultImg;
@@ -36,21 +36,22 @@ class SkinDetector
 		SkinDetector()
 		{
 			// initialize default parameters
-			hsvThreshold[0][0] = 50;
-			hsvThreshold[0][1] = 50;
-			hsvThreshold[0][2] = 50;
-			hsvThreshold[1][0] = 150;
-			hsvThreshold[1][1] = 150;
-			hsvThreshold[1][2] = 50;
+			hsvThreshold[0][0] = 0;
+			hsvThreshold[0][1] = 0;
+			hsvThreshold[0][2] = 0;
+			hsvThreshold[1][0] = 180;
+			hsvThreshold[1][1] = 255;
+			hsvThreshold[1][2] = 255;
 		}
 
-        void setThreshold(cv::Vec3b min, cv::Vec3b max)
+        void setThreshold(cv::Scalar min, cv::Scalar max)
 		{
 			hsvThreshold[0] = min;
 			hsvThreshold[1] = max;
+			std::cout << "min: " << min << "\t" << "max" << max << "\n";
 		}
 
-		void getThreshold(cv::Vec3b &min, cv::Vec3b &max)
+		void getThreshold(cv::Scalar &min, cv::Scalar &max)
 		{
 			min = hsvThreshold[0];
 			max = hsvThreshold[1];

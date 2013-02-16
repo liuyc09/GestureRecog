@@ -14,12 +14,15 @@ cv::Mat SkinDetector::processHSV(const cv::Mat &hsvImg)
 	//same cols and rows as original
 	resultImg.create(hsvImg.rows, hsvImg.cols, CV_8U);
 
-	ColorHistogram h();
+	ColorHistogram h;
 
 	//not sure if this will help *** test
 	//h.colorReduce(hsvImg);
 
 	cv::inRange(hsvImg, hsvThreshold[0], hsvThreshold[1], resultImg);
+
+	cv::Mat element5(8,8,CV_8U,cv::Scalar(1));
+	cv::morphologyEx(resultImg,resultImg,cv::MORPH_CLOSE,element5);
 
 	return resultImg;
 }
