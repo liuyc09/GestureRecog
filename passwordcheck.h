@@ -14,7 +14,7 @@ public:
 
 	void addHandSet(std::vector<Hand> set)
 	{
-        for(int i = 0; i < set.size() ; i++)
+        for(unsigned int i = 0; i < set.size() ; i++)
 			std::cout << "adding: " << set[i].type << "\t";
         input.push_back(set);
 	}
@@ -34,13 +34,13 @@ public:
 		Hand curHand;
         std::cout << "beginning yo mama check...\n";
 
+        std::cout << "array size:" << input.size();
 
 		while (true) //loop to allow reset sequence
 		{
-            if(input.size() - ++i -1 < 3) //check for too few items
+            if(input.size() - ++i < 3) //check for too few items
                 return false;
 
-            std::cout << input[0].size();
 			if(input[0].size() == 1)
 			{
 				if(input[i][0].type == FIST)
@@ -74,7 +74,7 @@ public:
 								input[i][0].type == UNK)
 							continue; //begin the loop again =  RESET, continue
 				}
-		        for(int j = 0; j < input.size() ; j++)
+                for(unsigned int j = 0; j < input.size() ; j++)
                     std::cout << "element: " << input[j][0].type << "\t";
 			}
 			else if(input[0].size() == 2)

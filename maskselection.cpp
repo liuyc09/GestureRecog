@@ -67,9 +67,9 @@ MaskSelection::MaskSelection(QWidget *parent) :
 
     // Hsv default filter (for default environment)
     min[0] = 0;
-    min[1] = 20;
-    min[2] = 106;
-    max[0] = 23;
+    min[1] = 60;
+    min[2] = 97;
+    max[0] = 180;
     max[1] = 255;
     max[2] = 255;
     setThreshold();

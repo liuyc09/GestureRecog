@@ -38,23 +38,25 @@ public:
 	void setType()
 	{
 		//decision for fist gesture
-		if(bRatio > .7 && bRatio < 1.5 &&
-			rRatio > .7 && rRatio < 1.7 &&
-            mom.m00 < 8500) //mass of the gesture
-			type = FIST;
-		//decision for palm gesture
-		else if(bRatio > .4 && bRatio < .9 &&
-					rRatio > 1.5 && rRatio < 2.1 &&
-                    mom.m00 > 8000 && mom.m00 < 15000) //mass of the gesture
-			type = PALM;
-		//decision for point gesture
-		//need two ranges for the inverse
+		//need two ranges for the rRatio and inverse
 		//because the rotated rect gives off opposite 
 		//width and height sometimes.
-		else if(bRatio > .4 && bRatio < .9 &&
-					((rRatio > 1.9 && rRatio < 2.6) ||
+		if(bRatio > .7 && bRatio < 1.5 &&
+				((rRatio >.7 && rRatio < 1.7) ||
+				(rRatio > .55 && rRatio < 1.5)) &&
+            	mom.m00 < 8500) //mass of the gesture
+			type = FIST;
+		//decision for palm gesture
+		else if(mom.m00 > 8000 && mom.m00 < 15000 &&
+					((rRatio > 1.5 && rRatio < 2.1) ||
+						(rRatio > .45 && rRatio < .66)) &&
+                    bRatio > .4 && bRatio < .9) //mass of the gesture
+			type = PALM;
+		//decision for point gesture
+		else if(mom.m00 > 3000 && mom.m00 < 9000 &&
+					((rRatio > 1.6 && rRatio < 2.6) ||
 						(rRatio > .35 && rRatio < .55)) && 
-					mom.m00 > 3000 && mom.m00 < 9000)
+					bRatio > .4 && bRatio < .9)
 			type = POINT;
 		//else print out 
 		else
@@ -102,7 +104,7 @@ public:
 	{
 		type = h.type;
 		rotRect = h.rotRect;
-		for(int i = 0; i < sizeof(rotPoints); i++)
+        for(unsigned int i = 0; i < sizeof(rotPoints); i++)
 			rotPoints[i] = h.rotPoints[i];
 		boxRect = h.boxRect;
 		mom = h.mom;
@@ -118,7 +120,7 @@ public:
 
 		type = rhs.type;
 		rotRect = rhs.rotRect;
-		for(int i = 0; i < sizeof(rotPoints); i++)
+        for(unsigned int i = 0; i < sizeof(rotPoints); i++)
 			rotPoints[i] = rhs.rotPoints[i];
 		boxRect = rhs.boxRect;
 		mom = rhs.mom;

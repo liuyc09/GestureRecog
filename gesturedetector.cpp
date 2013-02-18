@@ -88,8 +88,7 @@ void GestureDetector::updateTimer()
 {
 	timeCount = (timeCount + DELAY) % PASSINT;
 	cv::Mat image, filtered;
-	cap >> image;
-	bool correctPass = false;
+    cap >> image;
 
 	//set the image from the camera, process it and get filtered
 	SkinDetectController::getInstance()->setInputImage(image);
@@ -102,6 +101,7 @@ void GestureDetector::updateTimer()
 
     //if(hands.size() == 2 && hands[0].type == PALM && hands[1].type == PALM)
     if(timeCount < DELAY)
+    {
 		if(pw.checkPassword())
 		{
 			ui->textEdit->append("YAAAAAAAAAAAAAAAAYYYYYAYAYAYAYAYAYAYAY");
@@ -112,6 +112,7 @@ void GestureDetector::updateTimer()
             ui->textEdit->append(QString("Nope %1").arg(timeCount));
             pw.reset();
         }
+     }
 
 	displayMat(image);
 }
@@ -166,7 +167,7 @@ std::vector<Hand> GestureDetector::detect(cv::Mat &image, cv::Mat &filtered)
 	// iterate through all the top-level contours
 	for( ; idx >= 0; idx = hierarchy[idx][0] )
 	{
-		if(hands.size() > 1)
+		if(hands.size() > 0)
 			join = "\tand: ";
 
 		// compute all moments and mass
@@ -209,11 +210,11 @@ std::vector<Hand> GestureDetector::detect(cv::Mat &image, cv::Mat &filtered)
 
 			// print out the type of gesture found
             if(curHand.type == FIST)
-				ui->textEdit->append(join + "+++++++FIST+++++++");
+				ui->textEdit->append(join + "+++FIST+++" + curHand.toQString());
             else if(curHand.type == PALM)
-				ui->textEdit->append(join + "-----PALM------");
+				ui->textEdit->append(join + "---PALM---" + curHand.toQString());
             else if(curHand.type == POINT)
-				ui->textEdit->append(join + "=====POINT======");
+				ui->textEdit->append(join + "===POINT===" + curHand.toQString());
 			else //this is an unknown, non face gesture, print its details
 				ui->textEdit->append(join + curHand.toQString());
 		}
