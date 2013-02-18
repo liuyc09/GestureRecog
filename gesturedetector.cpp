@@ -15,6 +15,8 @@ GestureDetector::GestureDetector(QWidget *parent) :
 
 	ui->textEdit->setText("detector started\n");
 
+	timeCount = 0;
+
 }
 
 GestureDetector::~GestureDetector()
@@ -39,6 +41,7 @@ void GestureDetector::start()
 {
 	if(cap.isOpened())
 		timer->start(DELAY);
+	timeCount = 0;
 }
 
 void GestureDetector::beginPicSequence()
@@ -49,7 +52,10 @@ void GestureDetector::pause()
 	if(timer->isActive())
 		timer->stop();
 	else
+	{
+		timeCount = 0;
 		timer->start(DELAY);
+	}
 }
 
 
@@ -87,15 +93,18 @@ void GestureDetector::updateTimer()
 	SkinDetectController::getInstance()->process();
 	filtered = SkinDetectController::getInstance()->getLastResult();
 
-	detect(image, filtered);
+	std::vector<Hand> hands = detect(image, filtered);
 
 	displayMat(image);
+	timeCount = (timeCount + DELAY) % PASSINT;
 }
 
 
 // Detect and Identify the hand gesture present in the image
-void GestureDetector::detect(cv::Mat &image, cv::Mat &filtered)
+std::vector<Hand> GestureDetector::detect(cv::Mat &image, cv::Mat &filtered)
 {
+	std::vector<Hand> hands;
+
 	// find contours in the filtered image
 	std::vector< std::vector<cv::Point> > contours;
 	std::vector<cv::Vec4i> hierarchy;
@@ -132,7 +141,6 @@ void GestureDetector::detect(cv::Mat &image, cv::Mat &filtered)
 
 
 	//------------Find all skin regions-----------
-
 	int massMin = 2500;  // minimum contour mass
 	cv::Scalar color( 234, 180, 194 ); //random color
 	int idx = 0;
@@ -156,7 +164,7 @@ void GestureDetector::detect(cv::Mat &image, cv::Mat &filtered)
 		for(int i = 0; i < faces.size(); i++)
 		{
 			cv::Rect intersect = faces[i] & bRect;
-			if(intersect.width > 30 && intersect.height > 30)
+			if(intersect.width > 30 || intersect.height > 30)
 				faceOverlap = true;
 		}
 
@@ -164,54 +172,29 @@ void GestureDetector::detect(cv::Mat &image, cv::Mat &filtered)
 		// and ones that coincide with one of the found faces
 		if(cMass > massMin && !faceOverlap)
 		{
-			double bRatio = static_cast<double>(bRect.width)/bRect.height;
-
-			//find the ratio of the rotated rect
-			cv::Point2f rectPoints[4];
-			rotRect.points(rectPoints);
-			double rRatio = pointDist(rectPoints[2],rectPoints[1]) / pointDist(rectPoints[2], rectPoints[3]);
-
+			Hand curHand(rotRect, mom);
+			hands.push_back(curHand); //push the detected hand onto the list
 
 			// draw each connected component
-			cv::Mat contourImg(image.size(),image.type(), cv::Scalar(0));
+			cv::Mat contourImg(image.size(), image.type(), cv::Scalar(0));
 			cv::drawContours( contourImg, contours, idx, color, CV_FILLED, 8, hierarchy );
 			cv::GaussianBlur(contourImg, contourImg, cv::Size(5,5), 0);
 			image += contourImg;
 
-			// draw mass center
-			cv::circle(image,
-					// position of mass center converted to integer
-					center,
-					2, cv::Scalar(255),2); // draw blue dot
-
 			// draw bounding rotated rectangles
 			for( int j = 0; j < 4; j++ )
-				line( image, rectPoints[j], rectPoints[(j+1)%4], cv::Scalar(0,102,204), 3, 8 );
+				line( image, curHand.rotPoints[j], curHand.rotPoints[(j+1)%4], cv::Scalar(0,102,204), 3, 8 );
 
-			rectangle(image, bRect, cv::Scalar(0,204,102), 3);
+			rectangle(image, curHand.boxRect, cv::Scalar(0,204,102), 3);
 
-
-			//decision for fist gesture
-			if(bRatio > .7 && bRatio < 1.5 &&
-						rRatio > .7 && rRatio < 1.7 &&
-						cMass < 8500)
+			// print out the type of gesture found
+			if(curHand.type = HandType.FIST)
 				ui->textEdit->append("+++++++FIST+++++++");
-			//decision for palm gesture
-			else if(bRatio > .4 && bRatio < .9 &&
-						rRatio > 1.5 && rRatio < 2.1 &&
-						cMass > 8000 && cMass < 15000)
+			else if(curHand.type = HandType.PALM)
 				ui->textEdit->append("-----PALM------");
-			//decision for palm gesture
-			//need two ranges for the inverse
-			//because the rotated rect gives off opposite 
-			//width and height sometimes.
-			else if(bRatio > .4 && bRatio < .9 &&
-						((rRatio > 1.9 && rRatio < 2.6) ||
-							(rRatio > .35 && rRatio < .55)) && 
-						cMass > 3000 && cMass < 9000)
+			else if(curHand.type = HandType.POINT)
 				ui->textEdit->append("=====POINT======");
-			//else print out 
-			else
+			else //this is an unknown, non face gesture, print its details
 				ui->textEdit->append(QString("contour: %1\tarea: %2\tbratio: %3\trratio: %4\trot: %5")
 											.arg(idx).arg(cMass)
 											.arg(bRatio,0,'f',3)
@@ -220,9 +203,12 @@ void GestureDetector::detect(cv::Mat &image, cv::Mat &filtered)
 		}
 		else if(faceOverlap)
 		{
-			cv::ellipse(image, rotRect, cv::Scalar(0,0,255), 3, 8);
+			// this blob is a face, so draw an ellipse around it
+			cv::ellipse(image, rotRect, cv::Scalar(206,151,90), 3, 8);
 		}
 	}
+
+	return hands;
 }
 
 

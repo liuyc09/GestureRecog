@@ -36,30 +36,22 @@ public:
 	void setCap(cv::VideoCapture &cap);
 	void beginPicSequence();
 
-
-	
-	// Easy Calculation of Euclidean Distance
-	double pointDist(cv::Point2f &p1, cv::Point2f &p2)
-	{
-		double dx = p1.x - p2.x;
-		double dy = p1.y - p2.y;
-		return sqrt(dx * dx + dy * dy);
-	}
-
 	
 private:
 	Ui::GestureDetector *ui;
 	QTimer *timer;
 	cv::VideoCapture cap;
-	cv::CascadeClassifier cascadeFace;
+	cv::CascadeClassifier cascadeFace; //HAAR Cascade for detecting faces
 
-	static const int DELAY = 1000;
+	static const int DELAY = 1000; //Timer delay, determines how fast video plays
+	static const int PASSINT = 1000; //Interval between gesture captures
+	int timeCount;
 
 	//display an image in the dialog
 	void displayMat(const cv::Mat &image);
 
 	// Detect and Identify the hand gesture present in the image
-	void detect(cv::Mat &image, cv::Mat &filtered);
+	std::vector<Hand> detect(cv::Mat &image, cv::Mat &filtered);
 
 
 private slots:
