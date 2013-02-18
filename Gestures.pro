@@ -28,7 +28,9 @@ HEADERS  += \
     skindetector.h \
     gesturedetector.h \
     maskselection.h \
-    gesturedetector.h
+    gesturedetector.h \
+    hand.h \
+    passwordcheck.h
 
 FORMS    += \
     gesturedetector.ui \

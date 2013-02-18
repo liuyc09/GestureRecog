@@ -44,17 +44,18 @@ void GestureDetector::start()
 	timeCount = 0;
 }
 
-void GestureDetector::beginPicSequence()
-{}
-
 void GestureDetector::pause()
 {
 	if(timer->isActive())
+	{
 		timer->stop();
+		ui->btnPause->setText("Play");
+	}
 	else
 	{
 		timeCount = 0;
 		timer->start(DELAY);
+		ui->btnPause->setText("Pause");
 	}
 }
 
@@ -85,18 +86,34 @@ void GestureDetector::displayMat(const cv::Mat& image)
 
 void GestureDetector::updateTimer()
 {
+	timeCount = (timeCount + DELAY) % PASSINT;
 	cv::Mat image, filtered;
 	cap >> image;
+	bool correctPass = false;
 
 	//set the image from the camera, process it and get filtered
 	SkinDetectController::getInstance()->setInputImage(image);
 	SkinDetectController::getInstance()->process();
-	filtered = SkinDetectController::getInstance()->getLastResult();
+	filtered = SkinDetectController::getInstance()->getLastResult(); //binary image of blobs
 
+	//retrieve the hand gestures from the image from the image
 	std::vector<Hand> hands = detect(image, filtered);
+	pw.addHandSet(hands);
+
+    //if(hands.size() == 2 && hands[0].type == PALM && hands[1].type == PALM)
+    if(timeCount < DELAY)
+		if(pw.checkPassword())
+		{
+			ui->textEdit->append("YAAAAAAAAAAAAAAAAYYYYYAYAYAYAYAYAYAYAY");
+			pw.reset();
+		}
+		else
+		{
+            ui->textEdit->append(QString("Nope %1").arg(timeCount));
+            pw.reset();
+        }
 
 	displayMat(image);
-	timeCount = (timeCount + DELAY) % PASSINT;
 }
 
 
@@ -129,7 +146,7 @@ std::vector<Hand> GestureDetector::detect(cv::Mat &image, cv::Mat &filtered)
 	if(faces.size() > 1)
 		ui->textEdit->append("!!!!!!Tell the other guy to leave!!!!!!!");
 	// draw bounds for faces
-	for (int i = 0; i < faces.size(); i++ )
+    for (unsigned int i = 0; i < faces.size(); i++ )
 	{
 		//resize the rectangle to match the image
 		faces[i] += cv::Point(faces[i].x * 3,faces[i].y * 3);
@@ -141,13 +158,16 @@ std::vector<Hand> GestureDetector::detect(cv::Mat &image, cv::Mat &filtered)
 
 
 	//------------Find all skin regions-----------
-	int massMin = 2500;  // minimum contour mass
+	QString join("");
+	int massMin = 2500, massMax = 24000;  // minimum contour mass
 	cv::Scalar color( 234, 180, 194 ); //random color
 	int idx = 0;
 
 	// iterate through all the top-level contours
 	for( ; idx >= 0; idx = hierarchy[idx][0] )
 	{
+		if(hands.size() > 1)
+			join = "\tand: ";
 
 		// compute all moments and mass
 		cv::Moments mom = cv::moments(cv::Mat(contours[idx]));
@@ -161,7 +181,7 @@ std::vector<Hand> GestureDetector::detect(cv::Mat &image, cv::Mat &filtered)
 
 		// find intersections of detected faces and blobs
 		bool faceOverlap = false;
-		for(int i = 0; i < faces.size(); i++)
+        for(unsigned int i = 0; i < faces.size(); i++)
 		{
 			cv::Rect intersect = faces[i] & bRect;
 			if(intersect.width > 30 || intersect.height > 30)
@@ -170,7 +190,7 @@ std::vector<Hand> GestureDetector::detect(cv::Mat &image, cv::Mat &filtered)
 
 		// Eliminate contours that are too small,
 		// and ones that coincide with one of the found faces
-		if(cMass > massMin && !faceOverlap)
+		if(cMass > massMin && cMass < massMax && !faceOverlap)
 		{
 			Hand curHand(rotRect, mom);
 			hands.push_back(curHand); //push the detected hand onto the list
@@ -188,24 +208,25 @@ std::vector<Hand> GestureDetector::detect(cv::Mat &image, cv::Mat &filtered)
 			rectangle(image, curHand.boxRect, cv::Scalar(0,204,102), 3);
 
 			// print out the type of gesture found
-			if(curHand.type = HandType.FIST)
-				ui->textEdit->append("+++++++FIST+++++++");
-			else if(curHand.type = HandType.PALM)
-				ui->textEdit->append("-----PALM------");
-			else if(curHand.type = HandType.POINT)
-				ui->textEdit->append("=====POINT======");
+            if(curHand.type == FIST)
+				ui->textEdit->append(join + "+++++++FIST+++++++");
+            else if(curHand.type == PALM)
+				ui->textEdit->append(join + "-----PALM------");
+            else if(curHand.type == POINT)
+				ui->textEdit->append(join + "=====POINT======");
 			else //this is an unknown, non face gesture, print its details
-				ui->textEdit->append(QString("contour: %1\tarea: %2\tbratio: %3\trratio: %4\trot: %5")
-											.arg(idx).arg(cMass)
-											.arg(bRatio,0,'f',3)
-											.arg(rRatio,0,'f',3)
-											.arg(rotRect.angle));
+				ui->textEdit->append(join + curHand.toQString());
 		}
 		else if(faceOverlap)
 		{
 			// this blob is a face, so draw an ellipse around it
 			cv::ellipse(image, rotRect, cv::Scalar(206,151,90), 3, 8);
 		}
+	}
+	if(hands.size() == 0)
+	{
+		hands.push_back(Hand());
+		ui->textEdit->append("\\NONE\\");
 	}
 
 	return hands;

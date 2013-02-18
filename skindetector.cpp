@@ -24,7 +24,9 @@ cv::Mat SkinDetector::processHSV(const cv::Mat &hsvImg)
 
 	cv::inRange(hsvImg, hsvThreshold[0], hsvThreshold[1], resultImg);
 
-    
+
+    cv::blur(hsvImg, hsvImg, element3.size());
+    cv::blur(hsvImg, hsvImg, element3.size());
     cv::blur(hsvImg, hsvImg, element3.size());
 	// cv::erode(resultImg, resultImg, element5);
 	// cv::erode(resultImg, resultImg, element5);

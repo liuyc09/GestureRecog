@@ -278,10 +278,6 @@ void MaskSelection::beginDetection()
         gd->setCap(cap);
         gd->start();
     }
-    else
-    {
-        gd->beginPicSequence();
-    }
 
 }
 

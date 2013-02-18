@@ -17,6 +17,8 @@
 //color detector, controller, histogram
 #include "colorhistogram.h"
 #include "skindetectcontroller.h"
+#include "passwordcheck.h"
+#include "hand.h"
 
 static std::string FACEFILE = "/opt/local/share/OpenCV/haarcascades/haarcascade_frontalface_alt_tree.xml";
 
@@ -34,7 +36,6 @@ public:
 
 	void start();
 	void setCap(cv::VideoCapture &cap);
-	void beginPicSequence();
 
 	
 private:
@@ -42,9 +43,10 @@ private:
 	QTimer *timer;
 	cv::VideoCapture cap;
 	cv::CascadeClassifier cascadeFace; //HAAR Cascade for detecting faces
+	PasswordCheck pw;  //Class containing the passwords
 
-	static const int DELAY = 1000; //Timer delay, determines how fast video plays
-	static const int PASSINT = 1000; //Interval between gesture captures
+	static const int DELAY = 3000; //Timer delay, determines how fast video plays
+	static const int PASSINT = 9000; //Interval between gesture captures
 	int timeCount;
 
 	//display an image in the dialog

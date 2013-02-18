@@ -3,62 +3,87 @@
 
 #include "hand.h"
 #include "gesturedetector.h"
+#include <iostream>
 
 
 class PasswordCheck
 {
 
 public:
-	PasswordCheck() { input = new std::vector<std::vector<Hand> >();}
-	~PasswordCheck() { delete input; }
+    PasswordCheck() { }
 
 	void addHandSet(std::vector<Hand> set)
 	{
-		input.pushback(set);
+        for(int i = 0; i < set.size() ; i++)
+			std::cout << "adding: " << set[i].type << "\t";
+        input.push_back(set);
+	}
+
+	void reset()
+	{
+		input.clear();
+		std::cout << "clearing input.\n";
 	}
 
 	// NEEDS IMPROVEMENT!!!
 	// Implement with decision tree instead of conditionals
 	bool checkPassword()
-	{
-		if(input.size() < 3)
-			return false;
+    {
 		
-		int i =0;
+        int i = -1;
 		Hand curHand;
+        std::cout << "beginning yo mama check...\n";
 
 
 		while (true) //loop to allow reset sequence
 		{
+            if(input.size() - ++i -1 < 3) //check for too few items
+                return false;
+
+            std::cout << input[0].size();
 			if(input[0].size() == 1)
 			{
-				if(input[i][0].type() == HandType.FIST)
-					if(input[++i][0].type() == HandType.FIST)
-						if(input[++i][0].type() == HandType.FIST)
+				if(input[i][0].type == FIST)
+				{
+					std::cout << "level 1\n";
+					if(input[++i][0].type == FIST)
+						if(input[++i][0].type == FIST)
 							return true; // FIST / FIST / FIST
-				else if(input[i][0].type() == HandType.POINT)
-					if(input[++i][0].type() == HandType.FIST)
-						if(input[++i][0].type() == HandType.PALM)
+				}
+				else if(input[i][0].type == POINT)
+				{
+					std::cout << "level 2\n";
+					if(input[++i][0].type == FIST)
+						if(input[++i][0].type == PALM)
 							return true; // POINT / FIST / PALM
-				else if(input[i][0].type() == HandType.PALM)
-					if(input[++i][0].type() == HandType.NONE ||
-						input[i][0].type() == HandType.UNK)
-						if(input[++i][0].type() == HandType.PALM)
+				}
+				else if(input[i][0].type == PALM)
+				{
+					std::cout << "level 3\n";
+					if(input[++i][0].type == NONE ||
+						input[i][0].type == UNK)
+						if(input[++i][0].type == PALM)
 							return true; //PALM / (NONE|UNKOWN) / PALM
+				}
 				else
-					if(input[i][0].type() == HandType.NONE ||
-						input[i][0].type() == HandType.UNK)
-						if(input[++i][0].type() == HandType.NONE ||
-								input[i][0].type() == HandType.UNK)
+				{
+					std::cout << "level 4\n";
+                    if(input[++i][0].type == NONE ||
+						input[i][0].type == UNK)
+						if(input[++i][0].type == NONE ||
+								input[i][0].type == UNK)
 							continue; //begin the loop again =  RESET, continue
+				}
+		        for(int j = 0; j < input.size() ; j++)
+                    std::cout << "element: " << input[j][0].type << "\t";
 			}
 			else if(input[0].size() == 2)
 			{
-				if((input[i][0] == HandType.POINT && input[i][1] == HandType.PALM) ||
-					(input[i][1] == HandType.POINT && input[i][0] == HandType.PALM))
-					if((input[++i][0] == HandType.FIST && input[i][1] == HandType.FIST))
-						if((input[++i][0] == HandType.POINT && input[i][1] == HandType.FIST) ||
-							(input[i][1] == HandType.POINT && input[i][0] == HandType.FIST))
+				if((input[i][0].type == POINT && input[i][1].type == PALM) ||
+					(input[i][1].type == POINT && input[i][0].type == PALM))
+					if((input[++i][0].type == FIST && input[i][1].type == FIST))
+						if((input[++i][0].type == POINT && input[i][1].type == FIST) ||
+							(input[i][1].type == POINT && input[i][0].type == FIST))
 							return true; //PALM & POINT / FIST & FIST / FIST & POINT
 			}
 

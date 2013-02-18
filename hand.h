@@ -5,8 +5,7 @@
 #include <opencv2/core/core.hpp>
 
 
-enum HandType
-{
+enum HandType{
 	FIST,
 	PALM,
 	POINT,
@@ -19,10 +18,10 @@ class Hand
 
 public:
 	// VARIABLES
-	GestureDetector::HandType type;
+    HandType type;
 	cv::RotatedRect rotRect;
 	cv::Point2f rotPoints[4];
-	cv:Rect boxRect;
+    cv::Rect boxRect;
 	cv::Moments mom;	
 	double rRatio;
 	double bRatio;
@@ -41,13 +40,13 @@ public:
 		//decision for fist gesture
 		if(bRatio > .7 && bRatio < 1.5 &&
 			rRatio > .7 && rRatio < 1.7 &&
-			cMass < 8500)
-			type = HandType.FIST;
+            mom.m00 < 8500) //mass of the gesture
+			type = FIST;
 		//decision for palm gesture
 		else if(bRatio > .4 && bRatio < .9 &&
 					rRatio > 1.5 && rRatio < 2.1 &&
-					cMass > 8000 && cMass < 15000)
-			type = HandType.PALM;
+                    mom.m00 > 8000 && mom.m00 < 15000) //mass of the gesture
+			type = PALM;
 		//decision for point gesture
 		//need two ranges for the inverse
 		//because the rotated rect gives off opposite 
@@ -55,11 +54,20 @@ public:
 		else if(bRatio > .4 && bRatio < .9 &&
 					((rRatio > 1.9 && rRatio < 2.6) ||
 						(rRatio > .35 && rRatio < .55)) && 
-					cMass > 3000 && cMass < 9000)
-			type = HandType.POINT;
+					mom.m00 > 3000 && mom.m00 < 9000)
+			type = POINT;
 		//else print out 
 		else
-			type = HandType.UNK;
+			type = UNK;
+	}
+
+	QString toQString()
+	{
+		return QString("{area: %1  bratio: %2  rratio: %3  rot: %4}")
+											.arg(mom.m00)
+											.arg(bRatio,0,'f',3)
+											.arg(rRatio,0,'f',3)
+											.arg(rotRect.angle);
 	}
 
 
@@ -67,6 +75,12 @@ public:
 
 
 
+
+	//Default constructor
+	Hand()
+	{
+		type = NONE;
+	}
 
 	//Constructor
 	Hand(cv::RotatedRect r, cv::Moments m)
@@ -77,17 +91,48 @@ public:
 		rotRect.points(rotPoints);
 		boxRect = rotRect.boundingRect();
 
-		rRatio = pointDist(rectPoints[2],rectPoints[1]) / pointDist(rectPoints[2], rectPoints[3]);
+		rRatio = pointDist(rotPoints[2],rotPoints[1]) / pointDist(rotPoints[2], rotPoints[3]);
 		bRatio = static_cast<double>(boxRect.width)/boxRect.height;
 
 		setType();
 	}
 
-	Hand()
+	//copy constructor
+	Hand(const Hand& h)
 	{
-		type = HandType.NONE;
+		type = h.type;
+		rotRect = h.rotRect;
+		for(int i = 0; i < sizeof(rotPoints); i++)
+			rotPoints[i] = h.rotPoints[i];
+		boxRect = h.boxRect;
+		mom = h.mom;
+		bRatio = h.bRatio;
+		rRatio = h.rRatio;
 	}
 
+	//assignment operator
+	Hand& operator=(const Hand& rhs)
+	{
+		if(this == &rhs)
+			return *this;
+
+		type = rhs.type;
+		rotRect = rhs.rotRect;
+		for(int i = 0; i < sizeof(rotPoints); i++)
+			rotPoints[i] = rhs.rotPoints[i];
+		boxRect = rhs.boxRect;
+		mom = rhs.mom;
+		bRatio = rhs.bRatio;
+		rRatio = rhs.rRatio;
+
+		return *this;
+	}
+
+	//destructor
+	~Hand()
+	{
+
+	}
 };
 
 
