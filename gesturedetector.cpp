@@ -13,9 +13,9 @@ GestureDetector::GestureDetector(QWidget *parent) :
 	connect(timer, SIGNAL(timeout()), this, SLOT(updateTimer()));
 	connect(ui->btnPause, SIGNAL(clicked()), this, SLOT(pause()));
 
-	ui->textEdit->setText("detector started\n");
-
-	timeCount = 0;
+	ui->textEdit->setText("detector started\n"
+							"0 = FIST / 1 = PALM / 2 = POINT / 3 = UNKNOWN"
+							" / 4 = NONE\n\n");
 
 }
 
@@ -42,6 +42,7 @@ void GestureDetector::start()
 	if(cap.isOpened())
 		timer->start(DELAY);
 	timeCount = 0;
+	warnCount = 0;
 }
 
 void GestureDetector::pause()
@@ -86,7 +87,8 @@ void GestureDetector::displayMat(const cv::Mat& image)
 
 void GestureDetector::updateTimer()
 {
-	timeCount = (timeCount + DELAY) % PASSINT; //increment counter on a cycle
+	timeCount = (timeCount + DELAY) % RECINT; //increment counter on a cycle
+	warnCount = (warnCount + DELAY) % WARNINT;
 	cv::Mat image, filtered;
     cap >> image;
 
@@ -97,27 +99,50 @@ void GestureDetector::updateTimer()
 
 	//retrieve the hand gestures from the image from the image
 	std::vector<Hand> hands = detect(image, filtered);
-	pw.addHandSet(hands);
 
-    //if(timeCount < DELAY)
-    // Two Palms cause a password check
-    if(hands.size() == 2 && hands[0].type == PALM && hands[1].type == PALM)
-    {
-		if(pw.checkPassword())
-		{
-			ui->textEdit->append("----------------------\n"
-                                "PASSWORD ACCEPTED!!!!!!\n"
-                                "----------------------");
-			pw.reset();
-		}
+	if(timeCount < DELAY)
+	{ 
+		qDebug() << "Time: " << timeCount << "\n";
+		//this means the count has reset
+		//and reached the record interval
+		//so capture the hands and if necessary check
+		//the password
+
+		pw.addHandSet(hands);
+
+		if(hands.size() > 1)
+			ui->textEdit->append(hands[0].toQString()
+						 + "\n  and " + hands[1].toQString());
 		else
-		{
-            ui->textEdit->append("----------------------\n"
-                                "INTRUDER... INTRUDER....\n"
-                                "----------------------");
-            pw.reset();
-        }
-     }
+			ui->textEdit->append(hands[0].toQString());
+
+	
+	    // Two Palms or a sequence greater than 6 elements
+	    // cause a password check
+	    if(hands.size() >= 6 ||
+	    	(hands.size() == 2 && hands[0].type == PALM && hands[1].type == PALM))
+	    {
+			if(pw.checkPassword())
+				ui->textEdit->append("----------------------\n"
+	                                "PASSWORD ACCEPTED!!!!!!\n"
+	                                "----------------------");
+			else
+	            ui->textEdit->append("----------------------\n"
+	                                "INTRUDER... INTRUDER....\n"
+	                                "----------------------");
+			pw.reset();
+	     }
+	}
+
+	//warn the user of the time to capture
+	if(warnCount < DELAY)
+	{
+		int timeLeft = WARNMAX - timeCount/WARNINT;
+		if(timeLeft == WARNMAX)
+			ui->textEdit->append("\n\nPREPARE FOR CAPTURE IN....");
+		ui->textEdit->append(QString("%1...........").arg(timeLeft));
+	}
+	
 
 	displayMat(image);
 }
@@ -157,7 +182,7 @@ std::vector<Hand> GestureDetector::detect(cv::Mat &image, cv::Mat &filtered)
 		//resize the rectangle to match the image
 		faces[i] += cv::Point(faces[i].x * 3,faces[i].y * 3);
 		faces[i] += faces[i].size() +faces[i].size() +faces[i].size();
-		//rectangle(image, faces[i], cv::Scalar(0,0,204), 3);
+		rectangle(image, faces[i], cv::Scalar(0,0,204), 3);
 	}
 	//----------------End Face--------------------
 
@@ -213,26 +238,16 @@ std::vector<Hand> GestureDetector::detect(cv::Mat &image, cv::Mat &filtered)
 
 			rectangle(image, curHand.boxRect, cv::Scalar(0,204,102), 3);
 
-			// print out the type of gesture found
-            if(curHand.type == FIST)
-				ui->textEdit->append(join + "+++FIST+++" + curHand.toQString());
-            else if(curHand.type == PALM)
-				ui->textEdit->append(join + "---PALM---" + curHand.toQString());
-            else if(curHand.type == POINT)
-				ui->textEdit->append(join + "===POINT===" + curHand.toQString());
-			else //this is an unknown, non face gesture, print its details
-				ui->textEdit->append(join + curHand.toQString());
 		}
 		else if(faceOverlap)
 		{
 			// this blob is a face, so draw an ellipse around it
-			cv::ellipse(image, rotRect, cv::Scalar(206,151,90), 3, 8);
+			//cv::ellipse(image, rotRect, cv::Scalar(206,151,90), 3, 8);
 		}
 	}
 	if(hands.size() == 0)
 	{
 		hands.push_back(Hand());
-		ui->textEdit->append("\\NONE\\");
 	}
 
 	return hands;

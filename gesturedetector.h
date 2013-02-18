@@ -3,6 +3,7 @@
 
 #include <QDialog>
 #include <QTimer>
+#include <QDebug>
 
 //sys
 #include <iostream>
@@ -45,9 +46,13 @@ private:
 	cv::CascadeClassifier cascadeFace; //HAAR Cascade for detecting faces
 	PasswordCheck pw;  //Class containing the passwords
 
-	static const int DELAY = 3000; //Timer delay, determines how fast video plays
-	static const int PASSINT = 9000; //Interval between gesture captures
+	// TIMER VARS
+	static const int DELAY = 30; //Timer delay, determines how fast video plays
+	static const int RECINT = 3000; //Interval between gesture captures
+	static const int WARNINT = 1000; //Interval to print warnings to user
+	static const int WARNMAX = RECINT / WARNINT; //Maximum warning num
 	int timeCount;
+	int warnCount;
 
 	//display an image in the dialog
 	void displayMat(const cv::Mat &image);

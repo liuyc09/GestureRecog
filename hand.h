@@ -65,7 +65,27 @@ public:
 
 	QString toQString()
 	{
-		return QString("{area: %1  bratio: %2  rratio: %3  rot: %4}")
+		QString typeStr("");
+		switch (type) 
+		{
+			case FIST:
+				typeStr = "FIST";
+				break;
+			case PALM:
+				typeStr = "PALM";
+				break;
+			case POINT:
+				typeStr = "POINT";
+				break;
+			case UNK:
+				typeStr = "UNK";
+				break;
+			default:
+				typeStr = "NONE";
+				break;
+		}
+		return QString("%1 {area: %2  bratio: %3  rratio: %4  rot: %5}")
+											.arg(typeStr)
 											.arg(mom.m00)
 											.arg(bRatio,0,'f',3)
 											.arg(rRatio,0,'f',3)
