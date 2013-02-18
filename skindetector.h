@@ -48,7 +48,7 @@ class SkinDetector
 		{
 			hsvThreshold[0] = min;
 			hsvThreshold[1] = max;
-			std::cout << "min: " << min << "\t" << "max" << max << "\n";
+			//std::cout << "min: " << min << "\t" << "max" << max << "\n";
 		}
 
 		void getThreshold(cv::Scalar &min, cv::Scalar &max)

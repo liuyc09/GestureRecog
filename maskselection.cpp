@@ -24,7 +24,6 @@ MaskSelection::MaskSelection(QWidget *parent) :
 {
     //setup forms
     ui->setupUi(this);
-    gd = new GestureDetector();
 
 
     //set up video ------------------
@@ -45,6 +44,7 @@ MaskSelection::MaskSelection(QWidget *parent) :
     connect(ui->pushButton_Camera, SIGNAL(clicked()), this, SLOT(toggleCamera()));
     connect(ui->pushButton_Process, SIGNAL(clicked()), this, SLOT(processColorDetection()));
     connect(ui->pushButton_Histogram, SIGNAL(clicked()), this, SLOT(showHistogram()));
+    connect(ui->pushButton_Detect, SIGNAL(clicked()), this, SLOT(beginDetection()));
     connect(ui->verticalSlider_MinHue, SIGNAL(valueChanged(int)), 
                                             this, SLOT(setMinHue(int)));
     connect(ui->verticalSlider_MinSat, SIGNAL(valueChanged(int)), 
@@ -65,17 +65,17 @@ MaskSelection::MaskSelection(QWidget *parent) :
     histEnable = false;
     cHist = ColorHistogram();
 
-    //RGB defaults *** Change for Hsv
-    min[0] = 9;
-    min[1] = 51;
-    min[2] = 156;
+    // Hsv default filter (for default environment)
+    min[0] = 0;
+    min[1] = 20;
+    min[2] = 106;
     max[0] = 23;
-    max[1] = 160;
-    max[2] = 237;
+    max[1] = 255;
+    max[2] = 255;
     setThreshold();
 
     
-    // defaults for sliders
+    // set defaults for sliders
     ui->verticalSlider_MinHue->setSliderPosition(min[0]);
     ui->verticalSlider_MinSat->setSliderPosition(min[1]);
     ui->verticalSlider_MinValue->setSliderPosition(min[2]);
@@ -87,6 +87,7 @@ MaskSelection::MaskSelection(QWidget *parent) :
 MaskSelection::~MaskSelection()
 {
     delete ui;
+    delete timer;
     delete gd;
 }
 
@@ -266,7 +267,22 @@ void MaskSelection::setMaxValue(int value)
 //Display the detection form
 void MaskSelection::beginDetection()
 {
+    if(!gd)
+        gd = new GestureDetector(this);
+
     gd->show();
+
+    if(cap.isOpened())
+    {
+        toggleCamera();
+        gd->setCap(cap);
+        gd->start();
+    }
+    else
+    {
+        gd->beginPicSequence();
+    }
+
 }
 
 

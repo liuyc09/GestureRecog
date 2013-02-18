@@ -223,7 +223,7 @@
      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;center&quot;&gt;136&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
     </property>
    </widget>
-   <widget class="QPushButton" name="pushButton_SetMask">
+   <widget class="QPushButton" name="pushButton_Detect">
     <property name="geometry">
      <rect>
       <x>650</x>

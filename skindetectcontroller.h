@@ -87,6 +87,13 @@ class SkinDetectController
 			  return true;
 		}
 
+		cv::Mat getInputImage()
+		{
+			cv::Mat imgOut;
+			cv::cvtColor(hsvImage, imgOut, CV_HSV2BGR);
+			return imgOut;
+		}
+
 		// Returns the current input hsvImage.
 		// NOTE: this returns HSV!!!!!
 		const cv::Mat getHSVImage() const 

@@ -79,13 +79,13 @@ private slots:
     void toggleCamera();
     void updateTimer();
     void setThreshold();
+    void beginDetection();
     void setMinHue(int value);
     void setMinSat(int value);
     void setMinValue(int value);
     void setMaxHue(int value);
     void setMaxSat(int value);
     void setMaxValue(int value);
-    void beginDetection();
 };
 
 #endif // MASKSELECTION_H
