@@ -86,7 +86,7 @@ void GestureDetector::displayMat(const cv::Mat& image)
 
 void GestureDetector::updateTimer()
 {
-	timeCount = (timeCount + DELAY) % PASSINT;
+	timeCount = (timeCount + DELAY) % PASSINT; //increment counter on a cycle
 	cv::Mat image, filtered;
     cap >> image;
 
@@ -99,17 +99,22 @@ void GestureDetector::updateTimer()
 	std::vector<Hand> hands = detect(image, filtered);
 	pw.addHandSet(hands);
 
-    //if(hands.size() == 2 && hands[0].type == PALM && hands[1].type == PALM)
-    if(timeCount < DELAY)
+    //if(timeCount < DELAY)
+    // Two Palms cause a password check
+    if(hands.size() == 2 && hands[0].type == PALM && hands[1].type == PALM)
     {
 		if(pw.checkPassword())
 		{
-			ui->textEdit->append("YAAAAAAAAAAAAAAAAYYYYYAYAYAYAYAYAYAYAY");
+			ui->textEdit->append("----------------------\n"
+                                "PASSWORD ACCEPTED!!!!!!\n"
+                                "----------------------");
 			pw.reset();
 		}
 		else
 		{
-            ui->textEdit->append(QString("Nope %1").arg(timeCount));
+            ui->textEdit->append("----------------------\n"
+                                "INTRUDER... INTRUDER....\n"
+                                "----------------------");
             pw.reset();
         }
      }
