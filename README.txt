@@ -54,18 +54,18 @@ the 3 first captures are all NONE or UNK, the grammar restarts with the 4th
 capture.
 
 The hardcoded accepted password sequences are as follows:
-		(Capture 1 | Capture 2 | Capture 3)
-	1.	FIST | FIST | FIST
-	2.	POINT | FIST | PALM
-	3.	PALM | (NONE OR UNK) | PALM
-	4.	(PALM & POINT) | (FIST & FIST) | (POINT & FIST)
+        (Capture 1 | Capture 2 | Capture 3)
+    1.  FIST | FIST | FIST
+    2.  POINT | FIST | PALM
+    3.  PALM | (NONE OR UNK) | PALM
+    4.  (PALM & POINT) | (FIST & FIST) | (POINT & FIST)
 
 Two special sequences:
-	1.	(PALM & PALM) 
-			>immediately check the recorded sequence preceding
-	2.	(NONE OR UNK) | (NONE OR UNK) |(NONE OR UNK) 
-			>reset, and check for one of the passwords listed 
-			>above starting with the 4th capture
+    1.  (PALM & PALM) 
+            >immediately check the recorded sequence preceding
+    2.  (NONE OR UNK) | (NONE OR UNK) |(NONE OR UNK) 
+            >reset, and check for one of the passwords listed 
+            >above starting with the 4th capture
 
 
 
@@ -102,25 +102,25 @@ Source code specific to this program is contained in src/, extendable classes
 are contained in include/ as follows:
 
 GesturePasswords/
-	data/
-		|gesture data.xlsx (recorded data for my hand gestures)
-	include/
-		|colorhistogram.h 	-a class for displaying a histogram
-		|					 of the image (modified for HSV)
-		|hand.h
-		|skindetectcontroller.cpp	-a singleton wrapper with 
-		|								ease of use interfaces for 
-		|skindetectcontroller.h 			the SkinDetector class
-		|skindetector.cpp
-		|skindetector.h 		-the main processing class 
-		|							for detecting skin regions
-	src/
-		|gesturedetector.cpp	-detector form functions
-		|gesturedetector.h 		-detector form header
-		|gesturedetector.u 		-detector form design (QDialog QT 4.8)
-		|main.cpp				-project main method
-		|maskselection.cpp		-mask selection form functions
-		|maskselection.h 		-mask selection form header
-		|maskselection.ui 		-mask selection form design (QWindow QT 4.8)
-		|passwordcheck.h 		-class for storing and processing 
-		|							hand gesture password sequences
+    data/
+        |gesture data.xlsx (recorded data for my hand gestures)
+    include/
+        |colorhistogram.h   -a class for displaying a histogram
+        |                    of the image (modified for HSV)
+        |hand.h
+        |skindetectcontroller.cpp   -a singleton wrapper with 
+        |                             ease of use interfaces for 
+        |skindetectcontroller.h             the SkinDetector class
+        |skindetector.cpp
+        |skindetector.h         -the main processing class 
+        |                           for detecting skin regions
+    src/
+        |gesturedetector.cpp    -detector form functions
+        |gesturedetector.h      -detector form header
+        |gesturedetector.u      -detector form design (QDialog QT 4.8)
+        |main.cpp               -project main method
+        |maskselection.cpp      -mask selection form functions
+        |maskselection.h        -mask selection form header
+        |maskselection.ui       -mask selection form design (QWindow QT 4.8)
+        |passwordcheck.h        -class for storing and processing 
+        |                           hand gesture password sequences
