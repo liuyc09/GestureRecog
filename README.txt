@@ -1,4 +1,5 @@
-Creator: Jason Carlisle Mann (jcm2207@columbia.edu)
+Creator: Jason Carlisle Mann (on2valhalla | jcm2207@columbia.edu)
+Updated: 2013.02.18
 
 -----------
 DESCRIPTION
@@ -72,6 +73,7 @@ Two special sequences:
 ------ 
 ISSUES
 ------
+
 1.  The masks are configurable with the first form, but if
 there are skin-similar (in HSV) regions in the background, it can be hard to
 find the right masks. I have added a hardcoded inverse option that allows for a
@@ -97,11 +99,12 @@ in MacBook web cameras.
 ORGANIZATION 
 ------------
 
-
 Source code specific to this program is contained in src/, extendable classes
 are contained in include/ as follows:
 
 GesturePasswords/
+    bin/
+        |GesturePasswords.tar.gz    -binary package compiled 02.18.2013 (OSX)
     data/
         |gesture data.xlsx (recorded data for my hand gestures)
     include/
@@ -124,3 +127,13 @@ GesturePasswords/
         |maskselection.ui       -mask selection form design (QWindow QT 4.8)
         |passwordcheck.h        -class for storing and processing 
         |                           hand gesture password sequences
+
+
+
+-----
+USAGE
+-----
+
+A binary is provided in bin/ that was compiled on 02.18.2013 under
+OSX 10.8 with all required dependencies, no knowledge of whether this works
+on other systems.
