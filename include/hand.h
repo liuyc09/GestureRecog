@@ -1,3 +1,13 @@
+/*
+
+	Created by: Jason Carlisle Mann (on2valhalla | jcm2207@columbia.edu)
+
+	Creates a Hand, stores information on its geometry, and classifies
+	it as a certain type of gesture based on hardcoded geometric data
+
+*/
+
+
 #ifndef HAND_H
 #define HAND_H
 
@@ -39,7 +49,7 @@ public:
 	void setType()
 	{
 		// based on collected data
-		// of my own gestures, see data/gestures.xlsx
+		// of my own gestures, see doc/gesture data.xlsx
 
 		//decision for palm gesture
 		if 	(mom.m00 > 8500 &&

@@ -1,9 +1,9 @@
 Creator: Jason Carlisle Mann (on2valhalla | jcm2207@columbia.edu)
 Updated: 2013.02.18
 
------------
-DESCRIPTION
------------
+------------
+INTRODUCTION
+------------
 
 This project was designed for an assignment in COMS 4735 Visual Interfaces for
 Computers under the supervision of Prof. John Kender at Columbia University in
@@ -68,6 +68,25 @@ Two special sequences:
             >reset, and check for one of the passwords listed 
             >above starting with the 4th capture
 
+Upon entering a successful password, the system anounces in the text box
+PASSWORD ACCEPTED, and on failure: INTRUDER.... INTRUDER....
+
+-----------
+ENVIRONMENT
+-----------
+
+Due to creating a mask selection form, I tested in multiple locations and was
+able to acheive ~70% accuracy in most locations. Those that fared worse were
+generally sunlit areas, areas with uni-directional lighting, and areas that
+have flesh colored tones, or light birch wood everywhere (like the Science
+and Engineering Library). In a controlled environment, I have seen up to ~90%
+success, though with a system trained towards my hands. All in all, I attempted
+to eliminate the environment concerns from this project.
+
+However, because of the specific geometric data used, a long sleeve shirt is 
+required for accurate captures. Also, the recommended distance for the built-
+in MacBook Air iSight webcam (late 2011) is between 2.5 and 4 feet. This is due
+mostly to the mass measurement differing a palm from other gestures.
 
 
 ------ 
@@ -85,13 +104,17 @@ malfunction. This could be avoided by using either background substitution
 2.  The gesture recognition relies on ranges probably specific to my hands,
 and will have to be customized to each user in the code. This can be solved by
 an introductory training/calibration session for each user, but is beyond the
-scope of this project.
+scope of this project. A more fitting calibration would also be to separately
+label the left and right hands.
 
 3.  Auto-focus, and auto-exposure on modern web-cameras can cause a problem
 with the mask no longer being a valid fit, so if possible disable these
 options on your camera. On OSX there is no direct option, though through the
 use of iGlasses(Shareware/$19.95) you can disable auto-exposure on the built-
 in MacBook web cameras.
+
+4.  Currently only supports hardcoded camera number (set at 1 for iGlasses).
+to be fixed soon....
 
 
 
@@ -105,7 +128,7 @@ are contained in include/ as follows:
 GesturePasswords/
     bin/
         |GesturePasswords.tar.gz    -binary package compiled 02.18.2013 (OSX)
-    data/
+    doc/
         |gesture data.xlsx (recorded data for my hand gestures)
     include/
         |colorhistogram.h   -a class for displaying a histogram

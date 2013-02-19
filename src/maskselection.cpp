@@ -1,23 +1,22 @@
 /*------------------------------------------------------------------------------------------*\
-   This file contains material supporting chapter 3 of the cookbook:  
-   Computer Vision Programming using the OpenCV Library. 
-   by Robert Laganiere, Packt Publishing, 2011.
+    Created by: Jason Carlisle Mann (on2valhalla | jcm2207@columbia.edu)
 
-   This program is free software; permission is hereby granted to use, copy, modify, 
-   and distribute this source code, or portions thereof, for any purpose, without fee, 
-   subject to the restriction that the copyright notice may not be removed 
-   or altered from any source or altered source distribution. 
-   The software is released on an as-is basis and without any warranties of any kind. 
-   In particular, the software is not guaranteed to be fault-tolerant or free from failure. 
-   The author disclaims all warranties with regard to this software, any use, 
-   and any consequent failure, is purely the responsibility of the user.
- 
-   Copyright (C) 2010-2011 Robert Laganiere, www.laganiere.name
+    Some inspiration for design and organization from Robert Laganiere (OpenCV2 Cookbook)
+
+    This class is a QT based form, with sliders and a image display area
+    so that you can actively select a mask to create a binary skin image from
+    a standard RGB. The primary purpose of the form is to serve video, but
+    it also has an option to display photos. You select a mask by moving 
+    sliders (in HSV values) for the min and max thresholds sent to the 
+    SkinDetector class
+
 \*------------------------------------------------------------------------------------------*/
+
 
 #include "../src/maskselection.h"
 #include "../src/ui_maskselection.h"
 
+// Constructor
 MaskSelection::MaskSelection(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MaskSelection)
@@ -34,11 +33,11 @@ MaskSelection::MaskSelection(QWidget *parent) :
         ui->pushButton_Camera->setEnabled(false);
     //set up timer for camera display
     timer = new QTimer(this);
-    //end video ---------------------
+    //end setup video ---------------------
 
 
     // slot action methods -------------
-    //select color
+    // select color
     connect(timer, SIGNAL(timeout()), this, SLOT(updateTimer()));
     connect(ui->pushButton_OpenImage, SIGNAL(clicked()), this, SLOT(setImage()));
     connect(ui->pushButton_Camera, SIGNAL(clicked()), this, SLOT(toggleCamera()));
@@ -84,6 +83,7 @@ MaskSelection::MaskSelection(QWidget *parent) :
     ui->verticalSlider_MaxValue->setSliderPosition(max[2]);
 }
 
+// Destructor
 MaskSelection::~MaskSelection()
 {
     delete ui;
@@ -103,6 +103,11 @@ void MaskSelection::changeEvent(QEvent *e)
     }
 }
 
+/*
+    This method is called by a button on the form
+    and in turn pulls up an open file dialog, where
+    the user can select a photo for thresholding
+*/
 void MaskSelection::setImage()
 {
     timer->stop();
@@ -117,11 +122,16 @@ void MaskSelection::setImage()
     if (!fileName.isEmpty()){
         cv::Mat image = cv::imread(fileName.toStdString(),1); //0 for grayscale
         displayMat(image);
-        //Set Filename
+        //Send Filename to the skin detector
         SkinDetectController::getInstance()->setInputImage(fileName.toStdString());
     }
 }
 
+/*
+    Called by the Camera button, toggles the video feed
+    on and off by toggling the timer. It will only attempt to
+    turn on the timer if the cv::VideoCapture is opened
+*/
 void MaskSelection::toggleCamera()
 {
     if(!cap.isOpened())
@@ -135,7 +145,10 @@ void MaskSelection::toggleCamera()
 
 }
 
-//Convert cv::Mat to QImage and display
+/*
+    A simple conversion method to display a cv::Mat image (BGR or binary)
+    in a QLabel, that only takes a QImage as a pixelmap.
+*/
 void MaskSelection::displayMat(const cv::Mat& image)
 {
     //BGR openCV Mat to QImage
@@ -157,6 +170,11 @@ void MaskSelection::displayMat(const cv::Mat& image)
     this->ui->label->setPixmap(img_pix.scaled(ui->label->size(), Qt::KeepAspectRatio));
 }
 
+/*
+    Called by the process button, this method toggles the processing 
+    and the display of the processed images/video. This method calls
+    the process function from the SkinDetector class
+*/
 void MaskSelection::processColorDetection()
 {
     if(timer->isActive())
@@ -170,21 +188,28 @@ void MaskSelection::processColorDetection()
     }
 }
 
+/*
+    Controls the display of the video, on the interval set in
+    toggleCamera above. It also regulates the display of the 
+    histogram, and processing of the video.
+*/
 void MaskSelection::updateTimer()
 {
-    //translate to mat
     cv::Mat img;
-    cap >> img;
+    cap >> img; //capture a frame
+
+    //send SkinDetector the frame
     SkinDetectController::getInstance()->setInputImage(img);
     if(histEnable)
-    {
+    {   // update the histogram
         histogram = cHist.getHistogramImage(img);
         cv::imshow("Histogram", histogram);
     }
     if(process)
-    {
+    {   //process the frame
         SkinDetectController::getInstance()->process();
-    
+        
+        //retrieve the processed frame
         cv::Mat result = SkinDetectController::getInstance()->getLastResult();
         if (!result.empty())
             img = result;
@@ -192,28 +217,33 @@ void MaskSelection::updateTimer()
     displayMat(img);
 }
 
+/*
+    Toggles the histogram window on and off
+*/
 void MaskSelection::showHistogram()
 {
     if(timer->isActive() && !histEnable)
-    {
+    {   //create histogram window for video display
         cv::namedWindow("Histogram", cv::WINDOW_AUTOSIZE);
         histEnable = true;
     }
     else if (!timer->isActive())
-    {
+    {   //create histogram for image display
         histogram = cHist.getHistogramImage(SkinDetectController::getInstance()->getHSVImage());
         cv::imshow("Histogram", histogram);
         histEnable = false;
     }
     else
-    {
+    {   //destroy histogram window
         cv::destroyWindow("Histogram");
         histEnable = false;
     }
 }
 
-
-// Sets the skin detector masks min and max
+/*
+    Sets the skin detector's masks min and max from
+    their cached values
+*/
 void MaskSelection::setThreshold()
 {
     SkinDetectController::getInstance()->setThreshold(min, max);
@@ -221,6 +251,9 @@ void MaskSelection::setThreshold()
         processColorDetection();
 }
 
+/*
+    Changes minHue from slider
+*/
 void MaskSelection::setMinHue(int value)
 {
     min[0] = value;
@@ -228,6 +261,9 @@ void MaskSelection::setMinHue(int value)
     setThreshold();
 }
 
+/*
+    Changes minimum saturation from slider
+*/
 void MaskSelection::setMinSat(int value)
 {
     min[1] = value;
@@ -235,6 +271,9 @@ void MaskSelection::setMinSat(int value)
     setThreshold();
 }
 
+/*
+    Changes minimum value from slider
+*/
 void MaskSelection::setMinValue(int value)
 {
     min[2] = value;
@@ -242,6 +281,9 @@ void MaskSelection::setMinValue(int value)
     setThreshold();
 }
 
+/*
+    Changes maximum hue from slider
+*/
 void MaskSelection::setMaxHue(int value)
 {
     max[0] = value;
@@ -249,6 +291,9 @@ void MaskSelection::setMaxHue(int value)
     setThreshold();
 }
 
+/*
+    Changes maximum saturation from slider
+*/
 void MaskSelection::setMaxSat(int value)
 {
     max[1] = value;
@@ -256,6 +301,9 @@ void MaskSelection::setMaxSat(int value)
     setThreshold();
 }
 
+/*
+    Changes maximum value from slider
+*/
 void MaskSelection::setMaxValue(int value)
 {
     max[2] = value;
@@ -263,8 +311,11 @@ void MaskSelection::setMaxValue(int value)
     setThreshold();
 }
 
-
-//Display the detection form
+/*
+    Creates a new detection form if necessary, 
+    and sets up the form to begin recording hand
+    gestures
+*/
 void MaskSelection::beginDetection()
 {
     if(!gd)

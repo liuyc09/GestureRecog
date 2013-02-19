@@ -1,5 +1,20 @@
+/*
+
+Created by: Jason Carlisle Mann (on2valhalla | jcm2207@columbia.edu)
+
+This class is a QT based form (QDialog), with a display area for images
+or video, and a text pane for output
+
+Using the PasswordCheck class, it samples a video feed provided by
+cv::VideoCapture and analyzes it for skin blobs based on the SkinDetector
+class. It identifies faces first and labels them with a rectangle.
+The remaining skin blobs are analyzed as hand gestures, for the purpose
+of completing a password.
+
+*/
+
+
 #include "../src/gesturedetector.h"
-#include "../src/ui_gesturedetector.h"
 
 GestureDetector::GestureDetector(QWidget *parent) :
 	QDialog(parent),
@@ -13,9 +28,11 @@ GestureDetector::GestureDetector(QWidget *parent) :
 	connect(timer, SIGNAL(timeout()), this, SLOT(updateTimer()));
 	connect(ui->btnPause, SIGNAL(clicked()), this, SLOT(pause()));
 
-	ui->textEdit->setText("detector started\n"
-							"0 = FIST / 1 = PALM / 2 = POINT / 3 = UNKNOWN"
-							" / 4 = NONE\n\n");
+    ui->textEdit->setText("Welcome!\n"
+    					"You can display any combination of the following "
+    					"to attempt to unlock the password (1 or 2 at a time):\n"
+    					"{PALM, FIST, POINT UP, NONE, OTHER}\n\n"
+    					"To check your entry hold 2 palms up.");
 
 }
 
@@ -29,14 +46,17 @@ GestureDetector::~GestureDetector()
 void GestureDetector::reject()
 {
 	timer->stop();
+	ui->textEdit->setText("");
 	QDialog::reject();
 }
 
+//Set the video capture device
 void GestureDetector::setCap(cv::VideoCapture &cap)
 {
 	this->cap = cap;
 }
 
+//Start the timer
 void GestureDetector::start()
 {
 	if(cap.isOpened())
@@ -45,6 +65,7 @@ void GestureDetector::start()
 	warnCount = 0;
 }
 
+// Stop and Start the video
 void GestureDetector::pause()
 {
 	if(timer->isActive())
@@ -71,6 +92,7 @@ void GestureDetector::displayMat(const cv::Mat& image)
 
 	//For Binary Images
 	if (img_qt.isNull()){
+
 		//ColorTable for Binary Images
 		QVector<QRgb> colorTable;
 		for (int i = 0; i < 256; i++)
@@ -88,7 +110,7 @@ void GestureDetector::displayMat(const cv::Mat& image)
 void GestureDetector::updateTimer()
 {
 	timeCount = (timeCount + DELAY) % RECINT; //increment counter on a cycle
-	warnCount = (warnCount + DELAY) % WARNINT;
+	warnCount = (warnCount + DELAY) % WARNINT; //do same with the warning count
 	cv::Mat image, filtered;
     cap >> image;
 
@@ -101,26 +123,22 @@ void GestureDetector::updateTimer()
 	std::vector<Hand> hands = detect(image, filtered);
 
 	if(timeCount < DELAY)
-	{ 
-		qDebug() << "Time: " << timeCount << "\n";
-		//this means the count has reset
-		//and reached the record interval
-		//so capture the hands and if necessary check
-		//the password
+	{ // Only store the hands when the timeCount
+		//rolls over after iterating to the record
+		//interval (RECINT)
 
 		pw.addHandSet(hands);
 
+		//print out the captured hands
 		if(hands.size() > 1)
 			ui->textEdit->append(hands[0].toQString()
-						 + "\n  and " + hands[1].toQString());
+						 + "\n  and: " + hands[1].toQString());
 		else
 			ui->textEdit->append(hands[0].toQString());
 
 	
-	    // Two Palms or a sequence greater than 6 elements
-	    // cause a password check
-	    if(hands.size() >= 6 ||
-	    	(hands.size() == 2 && hands[0].type == PALM && hands[1].type == PALM))
+	    // Determine if it is time to check the password
+	    if(pw.doCheck(hands))
 	    {
 			if(pw.checkPassword())
 				ui->textEdit->append("----------------------\n"
@@ -134,7 +152,8 @@ void GestureDetector::updateTimer()
 	     }
 	}
 
-	//warn the user of the time to capture
+	// warn the user of the time to capture
+	// ticks down from WARNMAX to capture
 	if(warnCount < DELAY)
 	{
 		int timeLeft = WARNMAX - timeCount/WARNINT;
@@ -143,7 +162,7 @@ void GestureDetector::updateTimer()
 		ui->textEdit->append(QString("%1...........").arg(timeLeft));
 	}
 	
-
+	// display the processed image
 	displayMat(image);
 }
 
@@ -174,8 +193,7 @@ std::vector<Hand> GestureDetector::detect(cv::Mat &image, cv::Mat &filtered)
 	cv::cvtColor(gray, gray, CV_BGR2GRAY);
 	cv::equalizeHist(gray, gray);
 	cascadeFace.detectMultiScale(gray, faces);
-	if(faces.size() > 1)
-		ui->textEdit->append("!!!!!!Tell the other guy to leave!!!!!!!");
+
 	// draw bounds for faces
     for (unsigned int i = 0; i < faces.size(); i++ )
 	{
@@ -190,16 +208,13 @@ std::vector<Hand> GestureDetector::detect(cv::Mat &image, cv::Mat &filtered)
 
 	//------------Find all skin regions-----------
 	QString join("");
-	int massMin = 2500, massMax = 24000;  // minimum contour mass
-	cv::Scalar color( 234, 180, 194 ); //random color
+	int massMin = 5000, massMax = 24000;  // minimum contour mass
+    cv::Scalar color( 100, 150, 255 ); //random color
 	int idx = 0;
 
 	// iterate through all the top-level contours
 	for( ; idx >= 0; idx = hierarchy[idx][0] )
 	{
-		if(hands.size() > 0)
-			join = "\tand: ";
-
 		// compute all moments and mass
 		cv::Moments mom = cv::moments(cv::Mat(contours[idx]));
 		cv::Point center = cv::Point(mom.m10/mom.m00,mom.m01/mom.m00);
@@ -239,14 +254,9 @@ std::vector<Hand> GestureDetector::detect(cv::Mat &image, cv::Mat &filtered)
 			rectangle(image, curHand.boxRect, cv::Scalar(0,204,102), 3);
 
 		}
-		else if(faceOverlap)
-		{
-			// this blob is a face, so draw an ellipse around it
-			//cv::ellipse(image, rotRect, cv::Scalar(206,151,90), 3, 8);
-		}
 	}
 	if(hands.size() == 0)
-	{
+	{  //if no hands were found create a 'NONE' hand
 		hands.push_back(Hand());
 	}
 

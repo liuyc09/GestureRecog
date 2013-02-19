@@ -3,8 +3,10 @@
 	Computer Vision Programming using the OpenCV Library.
 	by Robert Laganiere, Packt Publishing, 2011.
 
-	This Class uses inputted ranges to detect skin from
-	HSV images
+	Created by: Jason Carlisle Mann (on2valhalla | jcm2207@columbia.edu)
+
+	This class uses holds input threshold min and max
+	masks to process an image for skin blobs in HSV colorspace
 */
 
 #if !defined SKINDETECT
@@ -57,7 +59,7 @@ class SkinDetector
 			max = hsvThreshold[1];
 		}
 
-		// Processes a already HSV image. Returns a 1-channel binary image.
+		// Processes an already HSV image. Returns a 1-channel binary image.
 		cv::Mat processHSV(const cv::Mat &image);
 };
 
