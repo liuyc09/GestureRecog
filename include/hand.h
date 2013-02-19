@@ -25,6 +25,7 @@ public:
 	cv::Moments mom;	
 	double rRatio;
 	double bRatio;
+	double mRatio; //mass ratio of bounding versus moments
 
 
 	// Easy Calculation of Euclidean Distance
@@ -37,29 +38,26 @@ public:
 
 	void setType()
 	{
-		//decision for fist gesture
-		//need two ranges for the rRatio and inverse
-		//because the rotated rect gives off opposite 
-		//width and height sometimes.
-		if(bRatio > .7 && bRatio < 1.5 &&
-				((rRatio >.7 && rRatio < 1.7) ||
-				(rRatio > .55 && rRatio < 1.5)) &&
-            	mom.m00 < 8500) //mass of the gesture
-			type = FIST;
+		// based on collected data
+		// of my own gestures, see data/gestures.xlsx
+
 		//decision for palm gesture
-		else if(mom.m00 > 8000 && mom.m00 < 15000 &&
-					((rRatio > 1.5 && rRatio < 2.1) ||
-						(rRatio > .45 && rRatio < .66)) &&
-                    bRatio > .4 && bRatio < .9) //mass of the gesture
+		if 	(mom.m00 > 8500 &&
+					bRatio > .5 && bRatio < .95 &&
+					((rRatio > .5 && rRatio < .6) ||
+					(rRatio > 1.5 && rRatio < 2)))
 			type = PALM;
+		else if(mom.m00 < 10000 &&
+					bRatio > .85 && rRatio >.7 &&
+			 		mRatio < 1.9)
+			type = FIST;
 		//decision for point gesture
-		else if(mom.m00 > 3000 && mom.m00 < 9000 &&
-					((rRatio > 1.6 && rRatio < 2.6) ||
-						(rRatio > .35 && rRatio < .55)) && 
+		else if(mom.m00 < 10000 &&
+					((rRatio > 1.4 && rRatio < 2.2) ||
+                    (rRatio > .35 && rRatio < .75)) &&
 					bRatio > .4 && bRatio < .9)
 			type = POINT;
-		//else print out 
-		else
+		else  //unknown gesture
 			type = UNK;
 	}
 
@@ -84,12 +82,12 @@ public:
 				typeStr = "NONE";
 				break;
 		}
-		return QString("%1 {area: %2  bratio: %3  rratio: %4  rot: %5}")
+		return QString("%1 area: %2  bratio: %3  rratio: %4  mratio: %5 ")
 											.arg(typeStr)
 											.arg(mom.m00)
 											.arg(bRatio,0,'f',3)
 											.arg(rRatio,0,'f',3)
-											.arg(rotRect.angle);
+											.arg(mRatio,0,'f',3);
 	}
 
 
@@ -115,6 +113,7 @@ public:
 
 		rRatio = pointDist(rotPoints[2],rotPoints[1]) / pointDist(rotPoints[2], rotPoints[3]);
 		bRatio = static_cast<double>(boxRect.width)/boxRect.height;
+		mRatio = (static_cast<double>(boxRect.width)*boxRect.height)/mom.m00;
 
 		setType();
 	}
@@ -130,6 +129,7 @@ public:
 		mom = h.mom;
 		bRatio = h.bRatio;
 		rRatio = h.rRatio;
+		mRatio = h.mRatio;
 	}
 
 	//assignment operator
@@ -146,6 +146,7 @@ public:
 		mom = rhs.mom;
 		bRatio = rhs.bRatio;
 		rRatio = rhs.rRatio;
+		mRatio = rhs.mRatio;
 
 		return *this;
 	}
