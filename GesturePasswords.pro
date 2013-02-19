@@ -26,7 +26,8 @@ HEADERS  += \
     src/gesturedetector.h \
     src/maskselection.h \
     include/hand.h \
-    include/passwordcheck.h
+    include/passwordcheck.h \
+    src/passwordcheck.h
 
 FORMS    += \
     src/gesturedetector.ui \

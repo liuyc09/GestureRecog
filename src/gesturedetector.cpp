@@ -16,6 +16,9 @@ of completing a password.
 
 #include "../src/gesturedetector.h"
 
+// for recording and documentation purposes
+static const char *DESKTOP = "/Users/on2valhalla/Desktop/pass";
+
 GestureDetector::GestureDetector(QWidget *parent) :
 	QDialog(parent),
 	ui(new Ui::GestureDetector)
@@ -28,11 +31,13 @@ GestureDetector::GestureDetector(QWidget *parent) :
 	connect(timer, SIGNAL(timeout()), this, SLOT(updateTimer()));
 	connect(ui->btnPause, SIGNAL(clicked()), this, SLOT(pause()));
 
-    ui->textEdit->setText("Welcome!\n"
-    					"You can display any combination of the following "
-    					"to attempt to unlock the password (1 or 2 at a time):\n"
-    					"{PALM, FIST, POINT UP, NONE, OTHER}\n\n"
-    					"To check your entry hold 2 palms up.");
+    setCount = 0;
+
+    intro = "Welcome!\n"
+			"You can display any combination of the following "
+			"to attempt to unlock the password (1 or 2 at a time):\n"
+			"{PALM, FIST, POINT UP, NONE, OTHER}\n\n"
+            "To check your entry hold 2 palms up.";
 
 }
 
@@ -63,6 +68,10 @@ void GestureDetector::start()
 		timer->start(DELAY);
 	timeCount = 0;
 	warnCount = 0;
+	ui->textEdit->setText(QString::fromStdString(intro));
+	imageCache.clear();
+	pw.reset();
+	ui->textEdit->append("\n\nPREPARE FOR CAPTURE IN....\n3....");
 }
 
 // Stop and Start the video
@@ -75,8 +84,7 @@ void GestureDetector::pause()
 	}
 	else
 	{
-		timeCount = 0;
-		timer->start(DELAY);
+		start();
 		ui->btnPause->setText("Pause");
 	}
 }
@@ -129,6 +137,8 @@ void GestureDetector::updateTimer()
 
 		pw.addHandSet(hands);
 
+		imageCache.push_back(image.clone());
+
 		//print out the captured hands
 		if(hands.size() > 1)
 			ui->textEdit->append(hands[0].toQString()
@@ -148,7 +158,19 @@ void GestureDetector::updateTimer()
 	            ui->textEdit->append("----------------------\n"
 	                                "INTRUDER... INTRUDER....\n"
 	                                "----------------------");
+
+	        char filename[200];
+	        //record pictures for documentation
+	        for(int i = 0; i < imageCache.size(); i++)
+	        {
+	        	sprintf(filename, "%s_%d_%d.jpg", DESKTOP, setCount, i);
+                cvSaveImage(filename, &(IplImage(imageCache[i])));
+            }
+
+
 			pw.reset();
+			setCount++;
+			imageCache.clear();
 	     }
 	}
 

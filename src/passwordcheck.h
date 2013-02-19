@@ -60,7 +60,7 @@ public:
 	*/
 	bool doCheck(std::vector<Hand> &hands)
 	{
-		if(hands.size() >= 6 ||
+		if(input.size() >= 6 ||
 	    		(hands.size() == 2 && hands[0].type == PALM 
 	    		&& hands[1].type == PALM))
 	    	return true;
@@ -81,7 +81,9 @@ public:
 	*/
 	bool checkPassword()
     {
-		
+		if(input.back()[0].type == PALM && input.back()[1].type == PALM)
+			input.pop_back();
+
         int i = -1; //start one low to allow addition early in loop
 		Hand curHand;
 
@@ -92,49 +94,43 @@ public:
 
 			if(input[0].size() == 1)
 			{
-				if(input[i][0].type == FIST)
-				{
-					std::cout << "level 1\n";
-					if(input[++i][0].type == FIST)
-						if(input[++i][0].type == FIST)
-							return true; // FIST / FIST / FIST
-				}
-				else if(input[i][0].type == POINT)
-				{
-					std::cout << "level 2\n";
-					if(input[++i][0].type == FIST)
-						if(input[++i][0].type == PALM)
-							return true; // POINT / FIST / PALM
-				}
-				else if(input[i][0].type == PALM)
-				{
-					std::cout << "level 3\n";
+				if(input[i][0].type == FIST){
+					if(input[++i][0].type == FIST){
+						if(input[++i][0].type == FIST){
+							if(input.size() - i == 1){
+								return true; // FIST / FIST / FIST
+							}}}}
+				else if(input[i][0].type == POINT){
+					if(input[++i][0].type == FIST){
+						if(input[++i][0].type == PALM){
+							if(input.size() - i == 1){
+								return true; // POINT / FIST / PALM
+							}}}}
+				else if(input[i][0].type == PALM){
 					if(input[++i][0].type == NONE ||
-						input[i][0].type == UNK)
-						if(input[++i][0].type == PALM)
-							return true; //PALM / (NONE|UNKOWN) / PALM
-				}
-				else
-				{
-					std::cout << "level 4\n";
+						input[i][0].type == UNK){
+						if(input[++i][0].type == PALM){
+							if(input.size() - i == 1){
+								return true; //PALM / (NONE|UNKOWN) / PALM
+							}}}}
+				else {
                     if(input[++i][0].type == NONE ||
-						input[i][0].type == UNK)
+						input[i][0].type == UNK){
 						if(input[++i][0].type == NONE ||
-								input[i][0].type == UNK)
+								input[i][0].type == UNK){
 							continue; //begin the loop again, continue
-										//searching with the next element
-				}
-                for(unsigned int j = 0; j < input.size() ; j++)
-                    std::cout << "element: " << input[j][0].type << "\t";
+							}}}			//searching with the next element
 			}
 			else if(input[0].size() == 2)
 			{
 				if((input[i][0].type == POINT && input[i][1].type == PALM) ||
-					(input[i][1].type == POINT && input[i][0].type == PALM))
-					if((input[++i][0].type == FIST && input[i][1].type == FIST))
+					(input[i][1].type == POINT && input[i][0].type == PALM)){
+					if((input[++i][0].type == FIST && input[i][1].type == FIST)){
 						if((input[++i][0].type == POINT && input[i][1].type == FIST) ||
-							(input[i][1].type == POINT && input[i][0].type == FIST))
-							return true; //PALM & POINT / FIST & FIST / FIST & POINT
+							(input[i][1].type == POINT && input[i][0].type == FIST)){
+							if(input.size() - i == 1){
+								return true; //PALM & POINT / FIST & FIST / FIST & POINT
+							}}}}
 			}
 
 			return false; // if you have reached this point you have failed to find the

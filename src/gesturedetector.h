@@ -24,10 +24,12 @@ of completing a password.
 #include <iostream>
 #include <string>
 #include <cmath>
+#include <stdio.h>
 
 //OpenCV
 #include <opencv2/core/core.hpp>
 #include <opencv2/highgui/highgui.hpp>
+#include <opencv/highgui.h>
 #include <opencv2/objdetect/objdetect.hpp>
 
 //locals
@@ -62,14 +64,20 @@ private:
 	cv::VideoCapture cap;
 	cv::CascadeClassifier cascadeFace; //HAAR Cascade for detecting faces
 	PasswordCheck pw;  //Class containing the passwords
+	std::string intro;
 
 	// TIMER VARS
 	static const int DELAY = 30; //Timer delay, determines how fast video plays
-	static const int RECINT = 1000; //Interval between gesture captures
+	static const int RECINT = 3000; //Interval between gesture captures
 	static const int WARNINT = 1000; //Interval to print warnings to user
 	static const int WARNMAX = RECINT / WARNINT; //Maximum warning num
 	int timeCount;
 	int warnCount;
+
+	//for recording and documentation
+	int setCount;
+	std::vector<cv::Mat> imageCache;
+
 
 	//display an image in the dialog
 	void displayMat(const cv::Mat &image);

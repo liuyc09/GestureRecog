@@ -57,15 +57,16 @@ public:
 					((rRatio > .5 && rRatio < .6) ||
 					(rRatio > 1.5 && rRatio < 2)))
 			type = PALM;
+		//fist
 		else if(mom.m00 < 10000 &&
-					bRatio > .85 && rRatio >.7 &&
-			 		mRatio < 1.9)
+					bRatio > .80 && rRatio >.7 &&
+			 		mRatio < 2)
 			type = FIST;
 		//decision for point gesture
 		else if(mom.m00 < 10000 &&
 					((rRatio > 1.4 && rRatio < 2.2) ||
                     (rRatio > .35 && rRatio < .75)) &&
-					bRatio > .4 && bRatio < .9)
+					bRatio > .4 && bRatio < 1.3)
 			type = POINT;
 		else  //unknown gesture
 			type = UNK;

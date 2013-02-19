@@ -17,7 +17,7 @@ The project is coded in C++, relying on OpenCV 2.4.3 for computer vision
 algorithms, and QT 4.8 (and QT Creator) for the design of the GUI forms. Some
 code and inspiration was found in the OpenCV2 Cookbook by Robert Laganiere,
 specifically the design of the SkinDetector and Controller classes (though not
-neccesarily the implementation).
+necessarily the implementation).
 
 The skin regions are differentiated from the background by manual configuration
 of an HSV thresholding mask (setting min and max for each value) through the use
@@ -25,14 +25,14 @@ of sliders on an introductory form. While photos can be thresholded, they are
 not implemented for use in the password grammar. The masks are applied using
 cv::inRange() to provide a binary image of skin regions, and that image is then
 blurred and closed (eroded()/dilate()). Once the correct mask is found, you
-procede to the detection form, which begins looking for hand gestures.
+proceed to the detection form, which begins looking for hand gestures.
 
 Immediately, any faces in the frame are identified and eliminated from
 consideration, using  OpenCV's built-in Haar cascade classifier
 (frontalface_alt_tree). Any other skin regions in the frame are considered to be
 hands, so a long sleeve shirt is required. These regions are captured as
 contours using cv::findContours. The gestures used for the passwords are
-captured at regular intervals (hardcoded to 3 seconds) to allow the user time to
+captured at regular intervals (hard coded to 3 seconds) to allow the user time to
 configure the next gesture.
 
 I chose five gestures (or absence of) for my grammar, a closed fist (FIST),
@@ -43,18 +43,18 @@ and minimum fit bounding rectangles, as well as the general mass of the moment
 of the contour points (see cv::Moment::m00). Any number of hand gestures can be
 captured in the frame, although a maximum of 2 is used for the password grammar.
 If there are two gestures in the capture, there is no differentiation between
-them, they are viewed as a non-ordered set. The passwords are hardcoded into the
+them, they are viewed as a non-ordered set. The passwords are hard coded into the
 PasswordCheck class as a tree of conditional statements, though this could
 easily be expanded to a search tree. The password sequences are all 3 sequences
 long (although they can have up to two gestures per sequence). There are two
 special sequences different from the passwords, two PALMs in one frame, and a
 sequence of 3 captures with no gesture detected. Two PALMs signifies that the
 password attempt is complete, and to check against the grammar. This check also
-occurs automatically if a sequence of 6 uninterupted captures is encountered. If
+occurs automatically if a sequence of 6 uninterrupted captures is encountered. If
 the 3 first captures are all NONE or UNK, the grammar restarts with the 4th
 capture.
 
-The hardcoded accepted password sequences are as follows:
+The hard coded accepted password sequences are as follows:
         (Capture 1 | Capture 2 | Capture 3)
     1.  FIST | FIST | FIST
     2.  POINT | FIST | PALM
@@ -68,7 +68,7 @@ Two special sequences:
             >reset, and check for one of the passwords listed 
             >above starting with the 4th capture
 
-Upon entering a successful password, the system anounces in the text box
+Upon entering a successful password, the system announces in the text box
 PASSWORD ACCEPTED, and on failure: INTRUDER.... INTRUDER....
 
 -----------
@@ -76,7 +76,7 @@ ENVIRONMENT
 -----------
 
 Due to creating a mask selection form, I tested in multiple locations and was
-able to acheive ~70% accuracy in most locations. Those that fared worse were
+able to achieve ~70% accuracy in most locations. Those that fared worse were
 generally sunlit areas, areas with uni-directional lighting, and areas that
 have flesh colored tones, or light birch wood everywhere (like the Science
 and Engineering Library). In a controlled environment, I have seen up to ~90%
@@ -96,7 +96,7 @@ ISSUES
 1.  The masks are configurable with the first form, but if
 there are skin-similar (in HSV) regions in the background, it can be hard to
 find the right masks. I have added a hardcoded inverse option that allows for a
-bit more configurability (specifically if the sought after color bridges the max
+bit more configuration (specifically if the sought after color bridges the max
 and min of the hue spectrum) but there are environments that can still cause
 malfunction. This could be avoided by using either background substitution
 (Codebook method), or histogram training.
@@ -126,6 +126,8 @@ Source code specific to this program is contained in src/, extendable classes
 are contained in include/ as follows:
 
 GesturePasswords/
+    GesturePassword.pro     -QT Creator project file
+    README.txt              -this file
     bin/
         |GesturePasswords.tar.gz    -binary package compiled 02.18.2013 (OSX)
     doc/
@@ -160,3 +162,7 @@ USAGE
 A binary is provided in bin/ that was compiled on 02.18.2013 under
 OSX 10.8 with all required dependencies, no knowledge of whether this works
 on other systems.
+
+Otherwise, if you have both OpenCV2 and QT Creator, simply import into Creator
+and run from there. If you have QT 4.8 you can also use the .pro file to 
+compile from the command line. ***More to Follow***

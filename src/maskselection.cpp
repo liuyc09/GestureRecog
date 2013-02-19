@@ -64,11 +64,11 @@ MaskSelection::MaskSelection(QWidget *parent) :
     histEnable = false;
     cHist = ColorHistogram();
 
-    // Hsv default filter (for default environment)
+    // Hsv default filter (for home environment)
     min[0] = 0;
-    min[1] = 60;
-    min[2] = 97;
-    max[0] = 180;
+    min[1] = 40;
+    min[2] = 93;
+    max[0] = 23;
     max[1] = 255;
     max[2] = 255;
     setThreshold();
